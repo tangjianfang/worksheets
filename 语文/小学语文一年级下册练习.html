@@ -117,39 +117,49 @@
     font-family: "楷体", "KaiTi", serif;
   }
 
-  /* ----- 连线题 ----- */
-  .link-wrap {
+  /* ----- 选词填空 ----- */
+  .bank {
+    border: 1px dashed #999;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    font-family: "楷体", "KaiTi", serif;
+    font-size: 15px;
+    line-height: 1.9;
+    color: #000;
+    letter-spacing: 1px;
+  }
+  .bank-title {
+    font-family: "Microsoft YaHei", sans-serif;
+    font-size: 12px; color: #666;
+    margin-right: 6px; letter-spacing: 0;
+  }
+  .fill-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 24mm;
-    padding: 4px 8mm 4px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 18px;
   }
-  .link-col { display: flex; flex-direction: column; gap: 8px; }
-  .link-item {
+  .fill-item {
     display: flex; align-items: center; gap: 6px;
-    font-size: 14px;
-    padding: 4px 0;
+    font-size: 14px; padding: 6px 4px;
   }
-  .link-item .num {
-    color: #999; font-size: 12px; min-width: 22px;
-  }
-  .link-item .char {
+  .fill-item .num { color: #999; font-size: 12px; min-width: 22px; }
+  .fill-item .char {
     font-family: "楷体", "KaiTi", serif;
     font-size: 22px; font-weight: bold;
-    min-width: 28px; text-align: center;
+    min-width: 26px; text-align: center;
   }
-  .link-item .word {
-    font-family: "楷体", "KaiTi", serif;
-    font-size: 16px;
+  .fill-item .py {
+    font-family: "Times New Roman", serif;
+    font-size: 12px; color: #888; min-width: 56px;
   }
-  .link-item .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #555; flex-shrink: 0;
+  .fill-item .paren {
+    flex: 1; display: flex; align-items: center;
+    font-size: 16px; color: #555;
   }
-  .link-col-left  .link-item { justify-content: flex-start; }
-  .link-col-left  .link-item .dot { margin-left: 8px; }
-  .link-col-right .link-item { justify-content: flex-start; flex-direction: row; }
-  .link-col-right .link-item .dot { margin-right: 8px; }
+  .fill-item .paren-line {
+    flex: 1; border-bottom: 1px solid #999; height: 18px;
+    margin: 0 4px;
+  }
 
   .footer {
     text-align: center; font-size: 11px; color: #aaa;
@@ -182,7 +192,7 @@
   <div class="ctrl-group">
     <label><input type="checkbox" id="cb-pinyin" checked /> 看拼音写字</label>
     <label><input type="checkbox" id="cb-tian"   checked /> 田字格练写</label>
-    <label><input type="checkbox" id="cb-ci"     checked /> 连线题</label>
+    <label><input type="checkbox" id="cb-ci"     checked /> 选词填空</label>
   </div>
   <div class="sep"></div>
   <button id="btn-generate">⟳ 重新生成</button>
@@ -489,36 +499,27 @@
   }
 
   function buildCiSection(words) {
-    // 连线题：左侧按顺序列出汉字，右侧随机顺序列出对应词语。
-    const items = words.map((w, i) => ({
+    // 选词填空：顶部给出打乱的词语库；下方按顺序列出汉字+拼音+括号空，
+    // 学生从词库中选出含该字的词填入。
+    const items = words.map(w => ({
       h: w.h, p: w.p,
-      c: WORD_MAP[w.h] || (w.h + '···'),
-      idx: i
+      c: WORD_MAP[w.h] || (w.h + '···')
     }));
-    const right = shuffle(items);
+    const bank = shuffle(items.map(it => it.c));
 
     let html = '<div class="section">';
-    html += '<div class="section-title">三、连线题 <span class="tip">（将左边的汉字与右边包含它的词语连起来）</span></div>';
-    html += '<div class="link-wrap">';
-    html += '<div class="link-col link-col-left">';
+    html += '<div class="section-title">三、选词填空·组词 <span class="tip">（从下面词语库中选出含该字的词语写在括号里）</span></div>';
+    html += '<div class="bank"><span class="bank-title">词语库：</span>' + bank.join(' 　 ') + '</div>';
+    html += '<div class="fill-grid">';
     items.forEach((w, i) => {
-      html += `<div class="link-item">
+      html += `<div class="fill-item">
         <span class="num">${i + 1}.</span>
         <span class="char">${w.h}</span>
-        <span class="dot"></span>
+        <span class="py">(${w.p})</span>
+        <span class="paren">（<span class="paren-line"></span>）</span>
       </div>`;
     });
-    html += '</div>';
-    html += '<div class="link-col link-col-right">';
-    right.forEach((w, i) => {
-      const letter = String.fromCharCode(65 + i); // A B C ...
-      html += `<div class="link-item">
-        <span class="dot"></span>
-        <span class="num">${letter}.</span>
-        <span class="word">${w.c}</span>
-      </div>`;
-    });
-    html += '</div></div></div>';
+    html += '</div></div>';
     return html;
   }
 
