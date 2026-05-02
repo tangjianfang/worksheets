@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小学数学计算练习</title>
+  <style>
+    /* ===== 全局 ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "宋体", "SimSun", serif;
+      background: #f0f0f0;
+    }
+
+    /* ===== 控制栏 ===== */
+    #controls {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #1565c0;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    }
+    #controls h1 {
+      font-size: 16px;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 15px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .radio-group input[type="radio"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #ffeb3b;
+    }
+    .sep { width: 1px; height: 28px; background: rgba(255,255,255,.4); }
+    #controls button {
+      padding: 6px 18px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: bold;
+      transition: opacity .15s;
+    }
+    #controls button:hover { opacity: .85; }
+    #btn-generate { background: #ffeb3b; color: #1a237e; }
+    #btn-print    { background: #43a047; color: #fff; }
+
+    /* ===== A4 练习页 ===== */
+    #page-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 24px 0 40px;
+    }
+    #a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      padding: 12mm 12mm 10mm;
+      box-shadow: 0 3px 18px rgba(0,0,0,.25);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* 标题 */
+    .page-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #333;
+    }
+
+    /* 信息栏 */
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 7px 4px;
+      font-size: 13px;
+      border-bottom: 1px solid #bbb;
+      margin-bottom: 6px;
+    }
+    .info-bar span { display: inline-block; }
+    .info-fill {
+      display: inline-block;
+      width: 80px;
+      border-bottom: 1px solid #555;
+      margin: 0 4px;
+      vertical-align: bottom;
+      height: 18px;
+    }
+
+    /* 题目网格 */
+    #problem-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+    }
+    .problem-cell {
+      border: 1px solid #e0e0e0;
+      padding: 6px 8px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 52px;
+    }
+    .problem-number {
+      font-size: 10px;
+      color: #999;
+      margin-bottom: 2px;
+    }
+    .problem-expr {
+      font-size: 17px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .answer-line {
+      border-bottom: 1px solid #555;
+      width: 28px;
+      display: inline-block;
+      vertical-align: bottom;
+      margin-left: 2px;
+      height: 16px;
+    }
+
+    /* 页脚 */
+    .page-footer {
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      padding-top: 6px;
+      border-top: 1px dashed #ccc;
+      margin-top: 4px;
+    }
+
+    /* ===== 打印样式 ===== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm;
+      }
+      body { background: none; }
+      #controls { display: none !important; }
+      #page-wrapper {
+        padding: 0;
+        display: block;
+      }
+      #a4-page {
+        width: 100%;
+        /* 297mm - 2×8mm @page margin */
+        height: 281mm;
+        min-height: unset;
+        box-shadow: none;
+        padding: 0;
+      }
+      .problem-cell {
+        border-color: #ccc;
+        /* 取消屏幕端 min-height，让行高由 grid 1fr 决定 */
+        min-height: 0;
+      }
+      .page-footer { color: #aaa; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 控制栏 -->
+<div id="controls">
+  <h1>数学计算练习生成器</h1>
+  <div class="sep"></div>
+  <div class="radio-group">
+    <span style="font-size:14px;">范围：</span>
+    <label>
+      <input type="radio" name="range" value="20" checked /> 20 以内
+    </label>
+    <label>
+      <input type="radio" name="range" value="100" /> 100 以内
+    </label>
+  </div>
+  <div class="sep"></div>
+  <div class="radio-group">
+    <span style="font-size:14px;">题数：</span>
+    <label><input type="radio" name="count" value="40" checked /> 40 题</label>
+    <label><input type="radio" name="count" value="50" /> 50 题</label>
+    <label><input type="radio" name="count" value="60" /> 60 题</label>
+  </div>
+  <div class="sep"></div>
+  <button id="btn-generate">&#x27F3; 重新生成</button>
+  <button id="btn-print">&#x1F5A8; 打印</button>
+</div>
+
+<!-- A4 页面 -->
+<div id="page-wrapper">
+  <div id="a4-page">
+    <div class="page-title" id="page-title">20以内加减法练习</div>
+    <div class="info-bar">
+      <span>姓名：<span class="info-fill"></span></span>
+      <span>日期：<span class="info-fill" style="width:100px;"></span></span>
+      <span>用时：<span class="info-fill" style="width:60px;"></span> 分钟</span>
+      <span>得分：<span class="info-fill" style="width:60px;"></span></span>
+    </div>
+    <div id="problem-grid"></div>
+    <div class="page-footer" id="page-footer">共 40 题 · 每题 2.5 分</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // -------- 工具函数 --------
+  function randInt(min, max) {
+    // 含两端整数
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // 生成一道题：{ expr: '12 + 7 = ', answer: 19 }
+  function generateProblem(maxVal) {
+    // 随机选加法或减法
+    const isAdd = Math.random() < 0.5;
+    let a, b, answer;
+    if (isAdd) {
+      // a + b = answer,  answer <= maxVal
+      a = randInt(1, maxVal - 1);
+      b = randInt(1, maxVal - a);
+      answer = a + b;
+    } else {
+      // a - b = answer,  a <= maxVal, b >= 1, answer >= 0
+      a = randInt(1, maxVal);
+      b = randInt(0, a);
+      answer = a - b;
+    }
+    const op = isAdd ? '+' : '−';
+    return { expr: `${a} ${op} ${b} =`, answer };
+  }
+
+  // 生成不重复题目列表
+  function generateProblems(maxVal, count) {
+    const seen = new Set();
+    const problems = [];
+    let attempts = 0;
+    while (problems.length < count && attempts < count * 20) {
+      attempts++;
+      const p = generateProblem(maxVal);
+      const key = p.expr;
+      if (!seen.has(key)) {
+        seen.add(key);
+        problems.push(p);
+      }
+    }
+    // 如果去重后不够，允许重复补足
+    while (problems.length < count) {
+      problems.push(generateProblem(maxVal));
+    }
+    return problems;
+  }
+
+  // -------- 渲染 --------
+  function getSelectedValue(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? parseInt(el.value, 10) : null;
+  }
+
+  function render() {
+    const maxVal = getSelectedValue('range') || 20;
+    const count  = getSelectedValue('count') || 40;
+
+    // 更新标题
+    document.getElementById('page-title').textContent =
+      `${maxVal}以内加减法练习`;
+
+    // 更新页脚
+    const scorePerQ = count > 0 ? (100 / count).toFixed(1) : 0;
+    document.getElementById('page-footer').textContent =
+      `共 ${count} 题 · 每题 ${scorePerQ} 分`;
+
+    // 调整网格列数和行数，使每行均分填满页面高度
+    const cols = 5;
+    const rows = Math.ceil(count / cols);
+    const grid = document.getElementById('problem-grid');
+    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+    // 生成题目
+    const problems = generateProblems(maxVal, count);
+
+    // 清空并渲染
+    grid.innerHTML = '';
+    problems.forEach((p, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'problem-cell';
+      cell.innerHTML =
+        `<div class="problem-number">${i + 1}.</div>` +
+        `<div class="problem-expr">${p.expr} <span class="answer-line"></span></div>`;
+      grid.appendChild(cell);
+    });
+  }
+
+  // -------- 事件绑定 --------
+  document.getElementById('btn-generate').addEventListener('click', render);
+  document.getElementById('btn-print').addEventListener('click', function () {
+    window.print();
+  });
+
+  // 切换范围/题数时自动重新生成
+  document.querySelectorAll('input[name="range"], input[name="count"]')
+    .forEach(function (el) {
+      el.addEventListener('change', render);
+    });
+
+  // 初始生成
+  render();
+})();
+</script>
+</body>
+</html>
