@@ -112,21 +112,41 @@
   .trans-line { flex: 1; border-bottom: 1px solid #999; height: 18px; }
 
   /* ----- 句型填空 ----- */
+  .word-bank {
+    border: 1px dashed #999;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #000;
+  }
+  .word-bank .bank-title {
+    font-family: "Microsoft YaHei", sans-serif;
+    font-size: 12px; color: #666;
+    margin-right: 6px;
+  }
   .cloze-list { padding-left: 4px; }
   .cloze-item {
-    display: flex; align-items: baseline; gap: 6px;
-    margin-bottom: 8px; font-size: 14px;
+    display: flex; align-items: flex-start; gap: 6px;
+    margin-bottom: 10px; font-size: 15px;
     font-family: "Times New Roman", serif;
   }
   .cloze-num { color: #999; min-width: 22px; font-size: 12px; font-family: inherit; }
+  .cloze-text { flex: 1; line-height: 2.2; }
+  .cloze-slot {
+    display: inline-flex; flex-direction: column;
+    align-items: center; vertical-align: middle;
+    margin: 0 4px;
+  }
   .cloze-blank {
     display: inline-block; min-width: 70px;
     border-bottom: 1px solid #999; height: 16px;
-    margin: 0 4px;
   }
-  .cloze-zh {
+  .cloze-hint {
     font-family: "Microsoft YaHei", sans-serif;
-    color: #888; font-size: 12px; margin-left: 4px;
+    color: #888; font-size: 11px;
+    margin-top: 1px;
   }
 
   .footer {
@@ -217,7 +237,7 @@
         { tpl: 'This is a {书桌}.' },
         { tpl: 'Open the {门}, please.' },
         { tpl: 'Look at the {黑板}.' },
-        { tpl: 'My {书包} is on the {椪子}.' },
+        { tpl: 'My {书包} is on the {椅子}.' },
         { tpl: 'Close the {窗户}.' }
       ],
       words: [
@@ -292,7 +312,7 @@
         { tpl: 'A {青蛙} is small.' },
         { tpl: 'I see a {蝴蝶}.' },
         { tpl: 'The {金鱼} can swim.' },
-        { tpl: 'Look at the {蛬蚪}.' },
+        { tpl: 'Look at the {蝌蚪}.' },
         { tpl: 'The {乌龟} is slow.' },
         { tpl: 'A {鸭子} can swim.' }
       ],
@@ -361,22 +381,29 @@
   }
 
   function buildClozeSection(unit) {
+    // 句型填空：模板形如 'It is {热} in {夏天}.'，每个 {中文} 渲染为
+    // 一条带中文小注释的下划线空白；学生从词库中选择对应英文填入。
     let html = '<div class="section">';
-    html += '<div class="section-title">三、句型填空 <span class="tip">（在横线上填入本单元单词）</span></div>';
+    html += '<div class="section-title">三、选词填空 <span class="tip">（根据括号下的中文提示，从词语库中选出对应单词写在横线上）</span></div>';
+
+    // 词语库（顶部，乱序）
+    const bank = shuffle(unit.words.map(w => w.en));
+    html += '<div class="word-bank">';
+    html += '<span class="bank-title">Word bank：</span>';
+    html += bank.join(' &nbsp;/&nbsp; ');
+    html += '</div>';
+
     html += '<div class="cloze-list">';
     unit.sentences.forEach((s, i) => {
-      const en = s.en.replace(/___/g, '<span class="cloze-blank"></span>');
+      // 把 {中文} 替换为带提示的空白
+      const rendered = s.tpl.replace(/\{([^}]+)\}/g, (_, zh) =>
+        `<span class="cloze-slot"><span class="cloze-blank"></span><span class="cloze-hint">（${zh}）</span></span>`
+      );
       html += `<div class="cloze-item">
         <span class="cloze-num">${i + 1}.</span>
-        <span>${en}</span>
-        <span class="cloze-zh">（${s.zh}）</span>
+        <span class="cloze-text">${rendered}</span>
       </div>`;
     });
-    // 提示词
-    html += '<div style="margin-top:8px;font-size:12px;color:#666;font-family:\'Microsoft YaHei\',sans-serif;">';
-    html += '可选词：<span style="font-family:Times New Roman,serif;color:#000;">';
-    html += unit.words.map(w => w.en).join(' / ');
-    html += '</span></div>';
     html += '</div></div>';
     return html;
   }
