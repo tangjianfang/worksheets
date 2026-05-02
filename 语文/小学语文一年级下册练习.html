@@ -499,16 +499,19 @@
   }
 
   function buildCiSection(words) {
-    // 选词填空：顶部给出打乱的词语库；下方按顺序列出汉字+拼音+括号空，
-    // 学生从词库中选出含该字的词填入。
+    // 选词填空：词语库只显示"搭档字"，隐去目标会写字（用 □ 占位）。
+    // 例如"春"对应"春天"，词库中显示为"□天"；学生写出完整词语。
     const items = words.map(w => ({
       h: w.h, p: w.p,
       c: WORD_MAP[w.h] || (w.h + '···')
     }));
-    const bank = shuffle(items.map(it => it.c));
+    const bankShows = items.map(it =>
+      it.c.split('').map(ch => ch === it.h ? '□' : ch).join('')
+    );
+    const bank = shuffle(bankShows);
 
     let html = '<div class="section">';
-    html += '<div class="section-title">三、选词填空·组词 <span class="tip">（从下面词语库中选出含该字的词语写在括号里）</span></div>';
+    html += '<div class="section-title">三、选词填空·组词 <span class="tip">（□ 处即为左边的汉字，请把完整的词语写在括号里）</span></div>';
     html += '<div class="bank"><span class="bank-title">词语库：</span>' + bank.join(' 　 ') + '</div>';
     html += '<div class="fill-grid">';
     items.forEach((w, i) => {
