@@ -44,57 +44,49 @@
   }
   .page-title {
     text-align: center; font-size: 20px; font-weight: bold;
-    letter-spacing: 1px; padding-bottom: 6px; border-bottom: 2px solid #333;
+    letter-spacing: 1px; padding-bottom: 6px;
+    border-bottom: 1px solid #999;
   }
   .info-bar {
     display: flex; justify-content: space-between; align-items: flex-end;
-    padding: 7px 4px; font-size: 13px; border-bottom: 1px solid #bbb;
-    margin-bottom: 8px;
+    padding: 7px 4px; font-size: 13px;
+    margin-bottom: 6px; color: #555;
   }
   .info-fill {
     display: inline-block; width: 80px;
-    border-bottom: 1px solid #555; margin: 0 4px; height: 18px;
+    border-bottom: 1px solid #999; margin: 0 4px; height: 18px;
     vertical-align: bottom;
   }
 
-  .section { margin-top: 8px; page-break-inside: avoid; }
+  .section { margin-top: 10px; page-break-inside: avoid; }
   .section-title {
-    background: #fff; border-left: 4px solid #333;
-    border-bottom: 1px solid #333;
-    padding: 4px 8px; font-weight: bold; font-size: 14px;
+    font-weight: bold; font-size: 14px;
+    padding: 2px 0 4px;
     margin-bottom: 8px;
+    color: #000;
   }
-  .tip { font-size: 11px; color: #666; font-weight: normal; margin-left: 6px; }
+  .tip { font-size: 11px; color: #888; font-weight: normal; margin-left: 6px; }
 
-  /* ----- 四线三格 ----- */
-  /*
-   * 高度 10mm = 三格各约 3.3mm，总 4 条线
-   * 顶/底为浅灰，中间两线为红色（标准英语本配色简化版）
-   */
+  /* ----- 四线三格（极简：仅顶/中/底三条浅灰线，不画第四条）----- */
   .four-line-row {
     display: grid;
     grid-template-columns: 24px 1fr;
     gap: 6px;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     align-items: center;
   }
   .fl-num { font-size: 11px; color: #999; }
   .fl-track {
     position: relative;
-    height: 10mm;
+    height: 9mm;
+    /* 仅 3 条极浅灰横线：顶 / 中 / 底 */
     background:
       linear-gradient(to bottom,
-        transparent 0,
-        transparent calc(0%  - 0.5px),
-        #888 0%,
-        #888 calc(0% + 0.5px),
-        transparent calc(0% + 0.5px));
-    /* 用 4 个 box-shadow 模拟 4 条线 */
-    box-shadow:
-      inset 0  0.5px 0 0 #555,           /* 顶线 */
-      inset 0  3.3mm 0 0 #000,           /* 第二线 黑 */
-      inset 0  6.6mm 0 0 #000,           /* 第三线 黑 */
-      inset 0 -0.5px 0 0 #555;           /* 底线 */
+        #bbb 0, #bbb 0.4px,
+        transparent 0.4px, transparent calc(50% - 0.2px),
+        #bbb calc(50% - 0.2px), #bbb calc(50% + 0.2px),
+        transparent calc(50% + 0.2px), transparent calc(100% - 0.4px),
+        #bbb calc(100% - 0.4px), #bbb 100%);
   }
   .fl-sample, .fl-blank {
     position: absolute; top: 0; bottom: 0;
@@ -103,55 +95,48 @@
     font-family: "Comic Sans MS", "Century Gothic", sans-serif;
   }
   .fl-sample {
-    left: 0; width: 38%;
-    color: #d0d0d0;
-    font-size: 22px;
-    border-right: 1px dashed #bbb;
+    left: 0; width: 30%;
+    color: #b8b8b8;
+    font-size: 20px;
   }
   .fl-blank {
-    left: 38%; right: 0;
-    color: #888; font-size: 11px;
-    justify-content: flex-end; font-style: italic;
+    left: 30%; right: 0;
   }
 
   /* ----- 中英互译 ----- */
   .trans-grid {
     display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 4px 16px;
+    gap: 6px 20px;
   }
   .trans-item {
     display: flex; align-items: center; gap: 6px;
-    font-size: 14px; padding: 6px;
-    border-bottom: 1px dotted #bbb;
+    font-size: 14px; padding: 5px 4px;
   }
   .trans-num { color: #999; min-width: 22px; font-size: 12px; }
-  .trans-q {
-    min-width: 95px; font-weight: bold;
-  }
+  .trans-q { min-width: 95px; }
   .trans-q.en { font-family: "Times New Roman", serif; color: #000; }
   .trans-q.zh { color: #000; }
-  .trans-line { flex: 1; border-bottom: 1px solid #555; height: 18px; }
+  .trans-line { flex: 1; border-bottom: 1px solid #999; height: 18px; }
 
   /* ----- 选词填空 ----- */
   .cloze-box {
-    border: 1px dashed #555;
-    padding: 6px 10px; margin-bottom: 8px;
+    padding: 8px 4px;
+    margin-bottom: 10px;
     font-size: 13px;
-    background: #fff;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
   }
-  .cloze-box .label { font-weight: bold; color: #000; margin-right: 6px; }
+  .cloze-box .label { font-weight: bold; color: #000; margin-right: 8px; }
   .cloze-word {
-    display: inline-block; padding: 1px 8px;
-    border: 1px solid #999; border-radius: 3px;
-    margin: 2px 4px; font-family: "Times New Roman", serif;
-    font-size: 13px;
+    display: inline-block;
+    margin: 2px 14px 2px 0;
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+    color: #000;
   }
-  .cloze-list {
-    list-style: none; padding: 0; margin: 0;
-  }
+  .cloze-list { list-style: none; padding: 0; margin: 0; }
   .cloze-q {
-    padding: 5px 4px;
-    border-bottom: 1px dotted #bbb;
+    padding: 6px 4px;
     font-size: 14px;
     font-family: "Times New Roman", serif;
     line-height: 1.6;
@@ -159,15 +144,14 @@
   .cloze-q .num { color: #999; font-family: inherit; margin-right: 4px; font-size: 12px; }
   .cloze-q .blank {
     display: inline-block; width: 80px;
-    border-bottom: 1px solid #555;
+    border-bottom: 1px solid #999;
     margin: 0 4px; height: 16px; vertical-align: bottom;
   }
   .cloze-q .zh-hint { color: #888; font-family: "Microsoft YaHei", sans-serif; font-size: 12px; margin-left: 6px; }
 
   .footer {
-    text-align: center; font-size: 11px; color: #999;
+    text-align: center; font-size: 11px; color: #aaa;
     padding-top: 8px; margin-top: auto;
-    border-top: 1px dashed #ccc;
   }
 
   /* ===== 打印 ===== */
@@ -344,7 +328,6 @@
         <div class="fl-num">${i + 1}.</div>
         <div class="fl-track">
           <div class="fl-sample">${w.en}</div>
-          <div class="fl-blank">copy here →</div>
         </div>
       </div>`;
     });
