@@ -117,29 +117,39 @@
     font-family: "楷体", "KaiTi", serif;
   }
 
-  /* ----- 组词区 ----- */
-  .ci-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 4px 16px;
+  /* ----- 连线题 ----- */
+  .link-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24mm;
+    padding: 4px 8mm 4px;
   }
-  .ci-item {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 14px; padding: 7px 6px;
+  .link-col { display: flex; flex-direction: column; gap: 8px; }
+  .link-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 14px;
+    padding: 4px 0;
   }
-  .ci-num { color: #999; min-width: 22px; font-size: 12px; }
-  .ci-char {
+  .link-item .num {
+    color: #999; font-size: 12px; min-width: 22px;
+  }
+  .link-item .char {
     font-family: "楷体", "KaiTi", serif;
-    font-size: 18px; font-weight: bold;
-    min-width: 24px; text-align: center;
+    font-size: 22px; font-weight: bold;
+    min-width: 28px; text-align: center;
   }
-  .ci-py {
-    font-family: "Times New Roman", serif;
-    font-size: 12px; color: #888; min-width: 56px;
+  .link-item .word {
+    font-family: "楷体", "KaiTi", serif;
+    font-size: 16px;
   }
-  .ci-blank {
-    flex: 1; border-bottom: 1px solid #999; height: 18px;
+  .link-item .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #555; flex-shrink: 0;
   }
-  .ci-blank + .ci-blank { margin-left: 8px; }
+  .link-col-left  .link-item { justify-content: flex-start; }
+  .link-col-left  .link-item .dot { margin-left: 8px; }
+  .link-col-right .link-item { justify-content: flex-start; flex-direction: row; }
+  .link-col-right .link-item .dot { margin-right: 8px; }
 
   .footer {
     text-align: center; font-size: 11px; color: #aaa;
@@ -172,7 +182,7 @@
   <div class="ctrl-group">
     <label><input type="checkbox" id="cb-pinyin" checked /> 看拼音写字</label>
     <label><input type="checkbox" id="cb-tian"   checked /> 田字格练写</label>
-    <label><input type="checkbox" id="cb-ci"     checked /> 组词练习</label>
+    <label><input type="checkbox" id="cb-ci"     checked /> 连线题</label>
   </div>
   <div class="sep"></div>
   <button id="btn-generate">⟳ 重新生成</button>
@@ -354,6 +364,84 @@
     ]}
   ];
 
+  /* ============================================================
+   * 词语映射：每个会写字配一个常用词（用于"连线题"）
+   * ============================================================ */
+  const WORD_MAP = {
+    // 识字1·春夏秋冬
+    '春':'春天','冬':'冬天','吹':'吹风','花':'花朵','飞':'飞走','入':'进入',
+    // 识字2·姓氏歌
+    '什':'什么','么':'怎么','古':'古代','胡':'胡子','双':'双手','言':'语言',
+    // 识字3·小青蛙
+    '青':'青草','清':'清水','晴':'晴天','苗':'禾苗','请':'请坐','生':'学生',
+    // 识字4·猜字谜
+    '字':'写字','红':'红色','动':'运动','万':'万岁','无':'无法','明':'明天',
+    // 语文园地一
+    '文':'语文','卡':'卡片','片':'图片','合':'合作',
+    // 课文1·热爱中国共产党
+    '共':'共同','产':'产生','党':'党员','太':'太阳','阳':'阳光','光':'光明',
+    // 课文2·吃水不忘挖井人
+    '井':'水井','主':'主人','江':'长江','住':'居住','方':'方法','后':'以后',
+    // 课文3·我多想去看看
+    '告':'告诉','的':'我的','会':'开会','北':'北方','京':'北京','广':'广场',
+    // 语文园地二
+    '写':'写字','认':'认真',
+    // 课文4·小公鸡和小鸭子
+    '走':'行走','河':'小河','说':'说话','让':'让开','自':'自己','己':'自己',
+    // 课文5·树和喜鹊
+    '从':'从前','好':'好人','们':'我们','叫':'叫声','他':'他们','回':'回家',
+    // 课文6·怎么都快乐
+    '快':'快乐','乐':'快乐','当':'当心','书':'读书','画':'图画','毛':'毛笔',
+    // 课文7·静夜思
+    '思':'思念','床':'床头','前':'前面','地':'土地','故':'故乡','乡':'家乡',
+    // 课文8·夜色
+    '色':'颜色','把':'把手','讲':'讲话','样':'一样','笑':'微笑','再':'再见',
+    // 课文9·端午粽
+    '节':'节日','米':'大米','间':'中间','分':'分开','吃':'吃饭','肉':'牛肉',
+    // 语文园地三
+    '止':'停止','斤':'公斤','寸':'寸土','丁':'人丁','千':'千万','旦':'元旦',
+    // 语文园地四
+    '册':'画册','支':'一支','电':'电灯','衣':'衣服',
+    // 识字5·动物儿歌
+    '物':'动物','造':'造句','运':'运动','欢':'喜欢','房':'房子','网':'网兜',
+    // 识字6·古对今
+    '对':'对错','今':'今天','雪':'白雪','细':'细心','夕':'夕阳','语':'语言',
+    // 识字7·操场上
+    '打':'打球','皮':'皮球','跑':'跑步','足':'足球','沙':'沙子','包':'书包',
+    // 识字8·人之初
+    '近':'附近','习':'学习','远':'远方','学':'学校','玉':'玉米','义':'意义',
+    // 语文园地五
+    '饱':'吃饱','抱':'拥抱',
+    // 课文10·古诗二首
+    '首':'一首','池':'水池','采':'采花','尖':'尖角','角':'牛角','早':'早上',
+    // 课文11·浪花
+    '眼':'眼睛','泪':'眼泪','它':'它们','贝':'贝壳','气':'空气','娃':'娃娃',
+    // 课文12·荷叶圆圆
+    '机':'飞机','台':'讲台','唱':'唱歌','伞':'雨伞','朵':'花朵','美':'美丽',
+    // 课文13·要下雨了
+    '这':'这里','看':'看见','鱼':'金鱼','面':'面前','问':'问题','加':'加油',
+    // 语文园地六
+    '豆':'豆子','斗':'北斗',
+    // 课文14·文具的家
+    '笔':'毛笔','知':'知道','道':'知道','放':'放学','平':'平安','安':'平安',
+    // 课文15·一分钟
+    '元':'元旦','灯':'电灯','车':'汽车','站':'车站','坐':'坐下','老':'老师','师':'老师',
+    // 课文16·动物王国开大会
+    '国':'中国','都':'都是','百':'百分','听':'听话','时':'时间','点':'地点','林':'树林',
+    // 课文17·小猴子下山
+    '高':'高兴','兴':'高兴','着':'看着','往':'前往','瓜':'西瓜','兔':'兔子','进':'前进',
+    // 语文园地七
+    '巾':'毛巾','洗':'洗手',
+    // 课文18·棉花姑娘
+    '她':'她们','空':'天空','还':'还有','干':'干净','身':'身体','星':'星星','久':'许久',
+    // 课文19·咕咚
+    '吓':'吓人','为':'因为','怕':'害怕','家':'回家','象':'大象','没':'没有','到':'到达',
+    // 课文20·小壁虎借尾巴
+    '向':'方向','边':'边上','行':'行走','草':'小草','赶':'追赶','过':'走过','找':'寻找',
+    // 语文园地八
+    '页':'一页','户':'门户','交':'交友','父':'父亲'
+  };
+
   /* ============= 工具 ============= */
   function shuffle(arr) {
     const a = arr.slice();
@@ -401,19 +489,36 @@
   }
 
   function buildCiSection(words) {
+    // 连线题：左侧按顺序列出汉字，右侧随机顺序列出对应词语。
+    const items = words.map((w, i) => ({
+      h: w.h, p: w.p,
+      c: WORD_MAP[w.h] || (w.h + '···'),
+      idx: i
+    }));
+    const right = shuffle(items);
+
     let html = '<div class="section">';
-    html += '<div class="section-title">三、组词练习 <span class="tip">（用每个字组两个不同的词语）</span></div>';
-    html += '<div class="ci-grid">';
-    words.forEach((w, i) => {
-      html += `<div class="ci-item">
-        <span class="ci-num">${i + 1}.</span>
-        <span class="ci-char">${w.h}</span>
-        <span class="ci-py">(${w.p})</span>
-        <span class="ci-blank"></span>
-        <span class="ci-blank"></span>
+    html += '<div class="section-title">三、连线题 <span class="tip">（将左边的汉字与右边包含它的词语连起来）</span></div>';
+    html += '<div class="link-wrap">';
+    html += '<div class="link-col link-col-left">';
+    items.forEach((w, i) => {
+      html += `<div class="link-item">
+        <span class="num">${i + 1}.</span>
+        <span class="char">${w.h}</span>
+        <span class="dot"></span>
       </div>`;
     });
-    html += '</div></div>';
+    html += '</div>';
+    html += '<div class="link-col link-col-right">';
+    right.forEach((w, i) => {
+      const letter = String.fromCharCode(65 + i); // A B C ...
+      html += `<div class="link-item">
+        <span class="dot"></span>
+        <span class="num">${letter}.</span>
+        <span class="word">${w.c}</span>
+      </div>`;
+    });
+    html += '</div></div></div>';
     return html;
   }
 
