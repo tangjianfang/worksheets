@@ -11,7 +11,7 @@
   /* ===== 控制栏 ===== */
   #controls {
     position: sticky; top: 0; z-index: 10;
-    background: #6a1b9a; color: #fff;
+    background: #1565c0; color: #fff;
     padding: 10px 20px;
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
     box-shadow: 0 2px 6px rgba(0,0,0,.3);
@@ -20,7 +20,7 @@
   .ctrl-group { display: flex; align-items: center; gap: 8px; font-size: 14px; }
   .ctrl-group select {
     padding: 4px 8px; font-size: 14px; border: none; border-radius: 4px;
-    font-family: inherit; cursor: pointer; min-width: 230px;
+    font-family: inherit; cursor: pointer; min-width: 220px;
   }
   .ctrl-group label {
     display: flex; align-items: center; gap: 4px; cursor: pointer; user-select: none;
@@ -62,92 +62,72 @@
   .section-title {
     font-weight: bold; font-size: 14px;
     padding: 2px 0 4px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: #000;
   }
   .tip { font-size: 11px; color: #888; font-weight: normal; margin-left: 6px; }
 
-  /* ----- 四线三格（极简：仅顶/中/底三条浅灰线，不画第四条）----- */
-  .four-line-row {
+  /* ----- 抄写区（四线三格） ----- */
+  .write-row {
     display: grid;
-    grid-template-columns: 24px 1fr;
-    gap: 6px;
-    margin-bottom: 6px;
+    grid-template-columns: 22px 70px 1fr 1fr;
+    gap: 0 6px;
+    margin-bottom: 5px;
     align-items: center;
   }
-  .fl-num { font-size: 11px; color: #999; }
+  .write-num { font-size: 11px; color: #999; }
+  .write-zh  { font-size: 13px; color: #333; }
+  .write-en  {
+    font-family: "Times New Roman", serif;
+    color: #c8c8c8; font-size: 16px; font-style: italic;
+    padding-left: 4px;
+  }
   .fl-track {
-    position: relative;
     height: 9mm;
-    /* 仅 3 条极浅灰横线：顶 / 中 / 底 */
     background:
       linear-gradient(to bottom,
-        #bbb 0, #bbb 0.4px,
-        transparent 0.4px, transparent calc(50% - 0.2px),
-        #bbb calc(50% - 0.2px), #bbb calc(50% + 0.2px),
-        transparent calc(50% + 0.2px), transparent calc(100% - 0.4px),
-        #bbb calc(100% - 0.4px), #bbb 100%);
+        transparent calc(25% - 0.5px), #bbb calc(25% - 0.5px), #bbb calc(25% + 0.5px), transparent calc(25% + 0.5px),
+        transparent calc(50% - 0.5px), #bbb calc(50% - 0.5px), #bbb calc(50% + 0.5px), transparent calc(50% + 0.5px),
+        transparent calc(75% - 0.5px), #bbb calc(75% - 0.5px), #bbb calc(75% + 0.5px), transparent calc(75% + 0.5px));
+    display: flex; align-items: center; padding: 0 6px;
   }
-  .fl-sample, .fl-blank {
-    position: absolute; top: 0; bottom: 0;
-    display: flex; align-items: center;
-    padding: 0 6px;
-    font-family: "Comic Sans MS", "Century Gothic", sans-serif;
-  }
-  .fl-sample {
-    left: 0; width: 30%;
-    color: #b8b8b8;
-    font-size: 20px;
-  }
-  .fl-blank {
-    left: 30%; right: 0;
+  .fl-track .fl-en {
+    color: #c8c8c8; font-size: 16px; font-style: italic;
+    font-family: "Times New Roman", serif;
   }
 
-  /* ----- 中英互译 ----- */
+  /* ----- 翻译区 ----- */
   .trans-grid {
     display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 6px 20px;
+    gap: 4px 16px;
   }
   .trans-item {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 14px; padding: 5px 4px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; padding: 7px 6px;
   }
   .trans-num { color: #999; min-width: 22px; font-size: 12px; }
-  .trans-q { min-width: 95px; }
-  .trans-q.en { font-family: "Times New Roman", serif; color: #000; }
-  .trans-q.zh { color: #000; }
+  .trans-q   { min-width: 110px; }
+  .trans-q.zh { font-size: 14px; }
+  .trans-q.en { font-family: "Times New Roman", serif; font-size: 15px; }
   .trans-line { flex: 1; border-bottom: 1px solid #999; height: 18px; }
 
-  /* ----- 选词填空 ----- */
-  .cloze-box {
-    padding: 8px 4px;
-    margin-bottom: 10px;
-    font-size: 13px;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-  }
-  .cloze-box .label { font-weight: bold; color: #000; margin-right: 8px; }
-  .cloze-word {
-    display: inline-block;
-    margin: 2px 14px 2px 0;
+  /* ----- 句型填空 ----- */
+  .cloze-list { padding-left: 4px; }
+  .cloze-item {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 8px; font-size: 14px;
     font-family: "Times New Roman", serif;
-    font-size: 14px;
-    color: #000;
   }
-  .cloze-list { list-style: none; padding: 0; margin: 0; }
-  .cloze-q {
-    padding: 6px 4px;
-    font-size: 14px;
-    font-family: "Times New Roman", serif;
-    line-height: 1.6;
+  .cloze-num { color: #999; min-width: 22px; font-size: 12px; font-family: inherit; }
+  .cloze-blank {
+    display: inline-block; min-width: 70px;
+    border-bottom: 1px solid #999; height: 16px;
+    margin: 0 4px;
   }
-  .cloze-q .num { color: #999; font-family: inherit; margin-right: 4px; font-size: 12px; }
-  .cloze-q .blank {
-    display: inline-block; width: 80px;
-    border-bottom: 1px solid #999;
-    margin: 0 4px; height: 16px; vertical-align: bottom;
+  .cloze-zh {
+    font-family: "Microsoft YaHei", sans-serif;
+    color: #888; font-size: 12px; margin-left: 4px;
   }
-  .cloze-q .zh-hint { color: #888; font-family: "Microsoft YaHei", sans-serif; font-size: 12px; margin-left: 6px; }
 
   .footer {
     text-align: center; font-size: 11px; color: #aaa;
@@ -173,14 +153,14 @@
   <h1>英语一年级下册 单元练习</h1>
   <div class="sep"></div>
   <div class="ctrl-group">
-    <span>Unit：</span>
+    <span>单元：</span>
     <select id="sel-unit"></select>
   </div>
   <div class="sep"></div>
   <div class="ctrl-group">
-    <label><input type="checkbox" id="cb-write" checked /> 单词抄写</label>
+    <label><input type="checkbox" id="cb-write" checked /> 抄写单词</label>
     <label><input type="checkbox" id="cb-trans" checked /> 中英互译</label>
-    <label><input type="checkbox" id="cb-cloze" checked /> 选词填空</label>
+    <label><input type="checkbox" id="cb-cloze" checked /> 句型填空</label>
   </div>
   <div class="sep"></div>
   <button id="btn-generate">⟳ 重新生成</button>
@@ -197,7 +177,7 @@
       <span>Score：<span class="info-fill" style="width:60px;"></span></span>
     </div>
     <div id="content"></div>
-    <div class="footer">教材：上海教育出版社 · 沪教牛津版（深圳用）小学英语 1B</div>
+    <div class="footer">教材：上海教育出版社 · 沪教牛津深圳版小学英语 1B（2025新版）</div>
   </div>
 </div>
 
@@ -206,107 +186,110 @@
   'use strict';
 
   /* ============================================================
-   * 词库：沪教牛津版（深圳用）小学英语 1B
-   * 数据：{ id, name, words:[{en, zh}], sentence: "句型示例" }
-   * ⚠️ 印刷使用前请按家中纸质课本逐项核对
+   * 词库：沪教牛津深圳版 一年级下册（2025新版 · 6 Units）
+   * 数据：{ id, name, sentences:[{en, zh}], words:[{en, zh}] }
    * ============================================================ */
   const UNITS = [
-    { id: 'm1u1', name: 'Module 1 Unit 1 — Look and see', sentence: 'I can see ___.', words: [
-      {en:'eye',  zh:'眼睛'},
-      {en:'eyes', zh:'两只眼睛'},
-      {en:'see',  zh:'看见'},
-      {en:'look', zh:'看'},
-      {en:'red',  zh:'红色的'},
-      {en:'green',zh:'绿色的'}
-    ]},
-    { id: 'm1u2', name: 'Module 1 Unit 2 — Listen and hear', sentence: 'I can hear ___.', words: [
-      {en:'ear',  zh:'耳朵'},
-      {en:'ears', zh:'两只耳朵'},
-      {en:'hear', zh:'听见'},
-      {en:'listen',zh:'听'},
-      {en:'bird', zh:'鸟'},
-      {en:'bell', zh:'铃'}
-    ]},
-    { id: 'm1u3', name: 'Module 1 Unit 3 — Taste and smell', sentence: 'I can smell / taste ___.', words: [
-      {en:'nose', zh:'鼻子'},
-      {en:'mouth',zh:'嘴'},
-      {en:'smell',zh:'闻'},
-      {en:'taste',zh:'尝'},
-      {en:'sweet',zh:'甜的'},
-      {en:'sour', zh:'酸的'}
-    ]},
-    { id: 'm2u4', name: 'Module 2 Unit 4 — Toys I like', sentence: 'I like ___.', words: [
-      {en:'doll',   zh:'娃娃'},
-      {en:'ball',   zh:'球'},
-      {en:'balloon',zh:'气球'},
-      {en:'kite',   zh:'风筝'},
-      {en:'car',    zh:'小汽车'},
-      {en:'train',  zh:'火车'}
-    ]},
-    { id: 'm2u5', name: 'Module 2 Unit 5 — Food I like', sentence: "I'd like some ___.", words: [
-      {en:'rice',     zh:'米饭'},
-      {en:'fish',     zh:'鱼'},
-      {en:'bread',    zh:'面包'},
-      {en:'milk',     zh:'牛奶'},
-      {en:'cake',     zh:'蛋糕'},
-      {en:'ice cream',zh:'冰淇淋'}
-    ]},
-    { id: 'm2u6', name: 'Module 2 Unit 6 — Doing things', sentence: 'I can ___.', words: [
-      {en:'sing',  zh:'唱歌'},
-      {en:'dance', zh:'跳舞'},
-      {en:'jump',  zh:'跳'},
-      {en:'swim',  zh:'游泳'},
-      {en:'run',   zh:'跑'},
-      {en:'draw',  zh:'画画'}
-    ]},
-    { id: 'm3u7', name: 'Module 3 Unit 7 — Small animals', sentence: 'It is a ___.', words: [
-      {en:'cat',   zh:'猫'},
-      {en:'dog',   zh:'狗'},
-      {en:'bird',  zh:'鸟'},
-      {en:'rabbit',zh:'兔子'},
-      {en:'fish',  zh:'鱼'},
-      {en:'duck',  zh:'鸭子'}
-    ]},
-    { id: 'm3u8', name: 'Module 3 Unit 8 — Hair', sentence: 'She has ___ hair.', words: [
-      {en:'long', zh:'长的'},
-      {en:'short',zh:'短的'},
-      {en:'hair', zh:'头发'},
-      {en:'big',  zh:'大的'},
-      {en:'small',zh:'小的'},
-      {en:'tall', zh:'高的'}
-    ]},
-    { id: 'm3u9', name: 'Module 3 Unit 9 — In my room', sentence: 'The ___ is in my room.', words: [
-      {en:'bed',   zh:'床'},
-      {en:'desk',  zh:'书桌'},
-      {en:'chair', zh:'椅子'},
-      {en:'door',  zh:'门'},
-      {en:'window',zh:'窗'},
-      {en:'room',  zh:'房间'}
-    ]},
-    { id: 'm4u10', name: 'Module 4 Unit 10 — The weather', sentence: 'It is ___ today.', words: [
-      {en:'sunny',  zh:'晴的'},
-      {en:'rainy',  zh:'下雨的'},
-      {en:'windy',  zh:'有风的'},
-      {en:'cloudy', zh:'多云的'},
-      {en:'hot',    zh:'热的'},
-      {en:'cold',   zh:'冷的'}
-    ]},
-    { id: 'm4u11', name: 'Module 4 Unit 11 — In the sky', sentence: 'I can see a ___ in the sky.', words: [
-      {en:'sun',  zh:'太阳'},
-      {en:'moon', zh:'月亮'},
-      {en:'star', zh:'星星'},
-      {en:'cloud',zh:'云'},
-      {en:'kite', zh:'风筝'},
-      {en:'plane',zh:'飞机'}
-    ]},
-    { id: 'm4u12', name: 'Module 4 Unit 12 — Sea and sand', sentence: 'I can see a ___ at the seaside.', words: [
-      {en:'sea',  zh:'大海'},
-      {en:'sand', zh:'沙子'},
-      {en:'shell',zh:'贝壳'},
-      {en:'fish', zh:'鱼'},
-      {en:'boat', zh:'小船'},
-      {en:'swim', zh:'游泳'}
-    ]}
+    {
+      id: 'u1', name: 'Unit 1 — Food I like',
+      sentences: [
+        { en: 'I like ___.',          zh: '我喜欢 ___。' },
+        { en: 'I don\'t like ___.',   zh: '我不喜欢 ___。' },
+        { en: 'Do you like ___?',     zh: '你喜欢 ___ 吗？' }
+      ],
+      words: [
+        {en:'noodles', zh:'面条（复数）'},
+        {en:'baozi',   zh:'包子'},
+        {en:'rice',    zh:'米饭'},
+        {en:'carrot',  zh:'胡萝卜'},
+        {en:'tomato',  zh:'西红柿'},
+        {en:'bread',   zh:'面包'},
+        {en:'egg',     zh:'鸡蛋'},
+        {en:'milk',    zh:'牛奶'}
+      ]
+    },
+    {
+      id: 'u2', name: 'Unit 2 — In the classroom',
+      sentences: [
+        { en: 'This is a ___.',           zh: '这是一个 ___。' },
+        { en: 'There is a ___ here.',     zh: '这里有一个 ___。' },
+        { en: 'Where is the ___?',        zh: '___ 在哪里？' }
+      ],
+      words: [
+        {en:'window',     zh:'窗户'},
+        {en:'blackboard', zh:'黑板'},
+        {en:'door',       zh:'门'},
+        {en:'desk',       zh:'书桌'},
+        {en:'chair',      zh:'椅子'},
+        {en:'schoolbag',  zh:'书包'}
+      ]
+    },
+    {
+      id: 'u3', name: 'Unit 3 — I can play',
+      sentences: [
+        { en: 'I can ___.',         zh: '我会 ___。' },
+        { en: 'Can you ___?',       zh: '你会 ___ 吗？' },
+        { en: 'Let\'s ___ together.', zh: '让我们一起 ___。' }
+      ],
+      words: [
+        {en:'ride a bike',     zh:'骑自行车'},
+        {en:'ride a scooter',  zh:'骑滑板车'},
+        {en:'rollerblade',     zh:'滑轮滑'},
+        {en:'play football',   zh:'踢足球'},
+        {en:'skateboard',      zh:'滑滑板'}
+      ]
+    },
+    {
+      id: 'u4', name: 'Unit 4 — Seasons',
+      sentences: [
+        { en: 'It is ___ in ___.',     zh: '在 ___ 天气是 ___ 的。' },
+        { en: 'I like ___.',           zh: '我喜欢 ___。' },
+        { en: 'It\'s ___ today.',      zh: '今天天气 ___。' }
+      ],
+      words: [
+        {en:'warm',   zh:'暖和的'},
+        {en:'summer', zh:'夏天'},
+        {en:'hot',    zh:'炎热的'},
+        {en:'autumn', zh:'秋天'},
+        {en:'cool',   zh:'凉爽的'},
+        {en:'winter', zh:'冬天'},
+        {en:'cold',   zh:'寒冷的'}
+      ]
+    },
+    {
+      id: 'u5', name: 'Unit 5 — Fruit',
+      sentences: [
+        { en: 'I like ___.',                    zh: '我喜欢 ___。' },
+        { en: 'This is a ___.',                 zh: '这是一个 ___。' },
+        { en: 'Do you want a ___?',             zh: '你想要一个 ___ 吗？' }
+      ],
+      words: [
+        {en:'lemon',      zh:'柠檬'},
+        {en:'banana',     zh:'香蕉'},
+        {en:'apple',      zh:'苹果'},
+        {en:'watermelon', zh:'西瓜'},
+        {en:'pear',       zh:'梨'},
+        {en:'pineapple',  zh:'菠萝'},
+        {en:'peach',      zh:'桃子'},
+        {en:'orange',     zh:'橙子'}
+      ]
+    },
+    {
+      id: 'u6', name: 'Unit 6 — Animals',
+      sentences: [
+        { en: 'A ___ is small.',     zh: '一只 ___ 很小。' },
+        { en: 'I see a ___.',        zh: '我看见一只 ___。' },
+        { en: 'The ___ can swim.',   zh: '___ 会游泳。' }
+      ],
+      words: [
+        {en:'tadpole',   zh:'蝌蚪'},
+        {en:'frog',      zh:'青蛙'},
+        {en:'butterfly', zh:'蝴蝶'},
+        {en:'goldfish',  zh:'金鱼'},
+        {en:'duck',      zh:'鸭子'},
+        {en:'tortoise',  zh:'乌龟'}
+      ]
+    }
   ];
 
   /* ============= 工具 ============= */
@@ -322,13 +305,13 @@
   /* ============= 渲染 ============= */
   function buildWriteSection(words) {
     let html = '<div class="section">';
-    html += '<div class="section-title">Ⅰ. Copy the words 单词抄写 <span class="tip">（在四线三格内规范书写）</span></div>';
+    html += '<div class="section-title">一、抄写单词 <span class="tip">（按四线三格规范抄写两遍）</span></div>';
     words.forEach((w, i) => {
-      html += `<div class="four-line-row">
-        <div class="fl-num">${i + 1}.</div>
-        <div class="fl-track">
-          <div class="fl-sample">${w.en}</div>
-        </div>
+      html += `<div class="write-row">
+        <div class="write-num">${i + 1}.</div>
+        <div class="write-zh">${w.zh}</div>
+        <div class="fl-track"><span class="fl-en">${w.en}</span></div>
+        <div class="fl-track"></div>
       </div>`;
     });
     html += '</div>';
@@ -336,17 +319,25 @@
   }
 
   function buildTransSection(words) {
-    // 一半 英→中，一半 中→英
-    const shuffled = shuffle(words);
-    const half = Math.ceil(shuffled.length / 2);
+    const items = shuffle(words);
+    let half = Math.ceil(items.length / 2);
+    const enToZh = items.slice(0, half);
+    const zhToEn = items.slice(half);
+
     let html = '<div class="section">';
-    html += '<div class="section-title">Ⅱ. Translate 中英互译 <span class="tip">（写出对应的中文或英文）</span></div>';
+    html += '<div class="section-title">二、中英互译 <span class="tip">（写出对应的中文或英文）</span></div>';
     html += '<div class="trans-grid">';
-    shuffled.forEach((w, i) => {
-      const isEn2Zh = i < half;
+    enToZh.forEach((w, i) => {
       html += `<div class="trans-item">
         <span class="trans-num">${i + 1}.</span>
-        <span class="trans-q ${isEn2Zh ? 'en' : 'zh'}">${isEn2Zh ? w.en : w.zh}</span>
+        <span class="trans-q en">${w.en}</span>
+        <span class="trans-line"></span>
+      </div>`;
+    });
+    zhToEn.forEach((w, i) => {
+      html += `<div class="trans-item">
+        <span class="trans-num">${enToZh.length + i + 1}.</span>
+        <span class="trans-q zh">${w.zh}</span>
         <span class="trans-line"></span>
       </div>`;
     });
@@ -355,27 +346,23 @@
   }
 
   function buildClozeSection(unit) {
-    const words = unit.words;
-    const picked = shuffle(words).slice(0, Math.min(5, words.length));
     let html = '<div class="section">';
-    html += '<div class="section-title">Ⅲ. Choose and fill in 选词填空 <span class="tip">（从词框中选择合适的单词填入横线）</span></div>';
-    // 词框（包含全部单词作为选项，含干扰）
-    html += '<div class="cloze-box"><span class="label">Word Bank：</span>';
-    shuffle(words).forEach(w => {
-      html += `<span class="cloze-word">${w.en}</span>`;
+    html += '<div class="section-title">三、句型填空 <span class="tip">（在横线上填入本单元单词）</span></div>';
+    html += '<div class="cloze-list">';
+    unit.sentences.forEach((s, i) => {
+      const en = s.en.replace(/___/g, '<span class="cloze-blank"></span>');
+      html += `<div class="cloze-item">
+        <span class="cloze-num">${i + 1}.</span>
+        <span>${en}</span>
+        <span class="cloze-zh">（${s.zh}）</span>
+      </div>`;
     });
-    html += '</div>';
-    // 填空句
-    html += '<ul class="cloze-list">';
-    picked.forEach((w, i) => {
-      const sentence = unit.sentence.replace('___', '<span class="blank"></span>');
-      html += `<li class="cloze-q">
-        <span class="num">${i + 1}.</span>${sentence}
-        <span class="zh-hint">（${w.zh}）</span>
-      </li>`;
-    });
-    html += '</ul>';
-    html += '</div>';
+    // 提示词
+    html += '<div style="margin-top:8px;font-size:12px;color:#666;font-family:\'Microsoft YaHei\',sans-serif;">';
+    html += '可选词：<span style="font-family:Times New Roman,serif;color:#000;">';
+    html += unit.words.map(w => w.en).join(' / ');
+    html += '</span></div>';
+    html += '</div></div>';
     return html;
   }
 
@@ -407,7 +394,7 @@
     const showCloze = document.getElementById('cb-cloze').checked;
 
     document.getElementById('page-title').textContent =
-      `English Practice · ${unit.name}`;
+      `英语一年级下册 · ${unit.name}`;
 
     const c = document.getElementById('content');
     c.innerHTML = '';
