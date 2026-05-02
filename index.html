@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>小学练习册 · 在线生成</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+    background: linear-gradient(135deg, #e3f2fd 0%, #fff8e1 100%);
+    min-height: 100vh;
+    color: #222;
+    padding: 24px 16px 60px;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+  header {
+    text-align: center;
+    padding: 28px 16px 32px;
+  }
+  header h1 {
+    font-size: 28px; letter-spacing: 2px; color: #1a237e;
+  }
+  header p {
+    margin-top: 8px; color: #555; font-size: 14px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 16px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+    padding: 22px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 4px solid var(--c, #888);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0,0,0,.12);
+  }
+  .card h2 {
+    font-size: 18px;
+    color: var(--c, #333);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card .tag {
+    display: inline-block;
+    font-size: 11px; padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--c, #888); color: #fff;
+    font-weight: normal;
+  }
+  .card p {
+    color: #666; font-size: 13px; line-height: 1.6;
+    flex: 1;
+  }
+  .card a.btn {
+    display: inline-block;
+    text-align: center;
+    padding: 9px 14px;
+    background: var(--c, #555);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: opacity .15s;
+  }
+  .card a.btn:hover { opacity: .85; }
+  .math    { --c: #2e7d32; }
+  .chinese { --c: #c62828; }
+  .english { --c: #1565c0; }
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #888;
+    font-size: 12px;
+  }
+  footer a { color: #555; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 小学练习册 · 在线生成</h1>
+      <p>所有练习均为 A4 单页可打印 · 支持随机重新生成 · 免登录</p>
+    </header>
+
+    <div class="grid">
+      <div class="card math">
+        <h2>数学 <span class="tag">加减法</span></h2>
+        <p>20 以内 / 100 以内 加减混合运算口算练习，可调整题量 40 / 50 / 60 题。</p>
+        <a class="btn" href="数学/小学数学加减法练习.html">打开练习</a>
+      </div>
+
+      <div class="card chinese">
+        <h2>语文 <span class="tag">一年级下册</span></h2>
+        <p>按课本写字表分单元 · 看拼音写字 · 田字格练写 · 选词填空·组词 三大题型。</p>
+        <a class="btn" href="语文/小学语文一年级下册练习.html">打开练习</a>
+      </div>
+
+      <div class="card english">
+        <h2>英语 <span class="tag">一年级下册</span></h2>
+        <p>沪教牛津深圳版 6 Units · 四线三格抄写 · 中英互译 · 句型选词填空。</p>
+        <a class="btn" href="英语/小学英语一年级下册练习.html">打开练习</a>
+      </div>
+    </div>
+
+    <footer>
+      © 小学练习册 · 仅供家庭学习使用 ·
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
