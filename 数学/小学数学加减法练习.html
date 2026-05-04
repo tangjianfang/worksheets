@@ -159,15 +159,19 @@
       margin-top: 4px;
     }
 
+    .answer-line { position: relative; }
     /* ===== 显示答案模式 ===== */
     .show-answers .answer-line[data-ans]::after {
       content: attr(data-ans);
-      display: inline-block;
+      position: absolute;
+      left: 50%;
+      bottom: 2px;
+      transform: translateX(-50%);
       color: #c62828;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: bold;
-      vertical-align: bottom;
-      line-height: 16px;
+      white-space: nowrap;
+      line-height: 1;
     }
 
     /* ===== 打印样式 ===== */
