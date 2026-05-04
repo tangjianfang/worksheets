@@ -260,10 +260,33 @@ document.getElementById('btn-print').addEventListener('click', () => {
   showAnswer = false;
   document.getElementById('answer-section').classList.remove('visible');
   render();
-  window.print();
+  smartPrint();
 });
 
 render();
+</script>
+<!-- 微信打印引导 -->
+<div id="wx-print-mask" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.65);padding:20px;box-sizing:border-box;">
+  <div style="background:#fff;border-radius:12px;padding:24px 20px;max-width:320px;margin:50px auto 0;font-family:'微软雅黑',sans-serif;text-align:center;">
+    <div style="font-size:40px;margin-bottom:10px">📱</div>
+    <div style="font-size:16px;font-weight:bold;color:#1a237e;margin-bottom:12px">微信内无法直接打印</div>
+    <div style="font-size:14px;color:#333;line-height:2.1;text-align:left;background:#f5f5f5;border-radius:8px;padding:12px 14px">
+      ① 点击右上角 <strong>···</strong> 菜单<br>
+      ② 选择 <strong>在浏览器打开</strong><br>
+      ③ 在 Safari / Chrome 中<br>
+      &nbsp;&nbsp;&nbsp;再点击“打印练习”按鈕
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:#bbb">点击任意处关闭</div>
+  </div>
+</div>
+<script>
+function smartPrint() {
+  if (/MicroMessenger/i.test(navigator.userAgent)) {
+    document.getElementById('wx-print-mask').style.display = 'block';
+    return;
+  }
+  window.print();
+}
 </script>
 </body>
 </html>
