@@ -32,7 +32,6 @@
   #btn-lessons  { background: #fff3e0; color: #e65100; }
   #btn-generate { background: #ffeb3b; color: #1a237e; }
   #btn-answer   { background: #e8f5e9; color: #2e7d32; }
-  #btn-mark     { background: #fce4ec; color: #c62828; }
   #btn-print    { background: #f57c00; color: #fff; }
   #btn-home { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.45); font-weight: normal; }
   #btn-home:hover { background: rgba(255,255,255,.32); }
@@ -354,7 +353,8 @@
   </div>
   <div class="sep"></div>
   <button id="btn-generate">⟳ 重新生成</button>
-  <button id="btn-answer">👁 显示答案</button>  <button id="btn-mark">✓ 批改模式</button>  <button id="btn-print">🖨 打印</button>
+  <button id="btn-answer">👁 显示答案</button>
+  <button id="btn-print">🖨 打印</button>
 </div>
 
 <!-- 课文选择面板 -->
@@ -753,8 +753,9 @@
     });
     document.getElementById('answer-section').classList.remove('visible');
     document.getElementById('btn-answer').textContent = '👁 显示答案';
+    document.getElementById('btn-answer').style.background = '';
+    document.getElementById('btn-answer').style.color = '';
     document.getElementById('a4-page').classList.remove('show-answers');
-    document.getElementById('btn-mark').textContent = '✓ 批改模式';
 
     content.innerHTML = '';
     let sn = 1;  // section number
@@ -916,18 +917,13 @@
   document.getElementById('btn-print').addEventListener('click', () => smartPrint());
   document.getElementById('btn-answer').addEventListener('click', () => {
     const sec = document.getElementById('answer-section');
+    const page = document.getElementById('a4-page');
     const btn = document.getElementById('btn-answer');
     const visible = sec.classList.toggle('visible');
+    page.classList.toggle('show-answers', visible);
     btn.textContent = visible ? '👁 隐藏答案' : '👁 显示答案';
-  });
-
-  document.getElementById('btn-mark').addEventListener('click', () => {
-    const page = document.getElementById('a4-page');
-    const btn = document.getElementById('btn-mark');
-    const on = page.classList.toggle('show-answers');
-    btn.textContent = on ? '✓ 隐藏批改' : '✓ 批改模式';
-    btn.style.background = on ? '#c62828' : '';
-    btn.style.color = on ? '#fff' : '';
+    btn.style.background = visible ? '#c62828' : '';
+    btn.style.color = visible ? '#fff' : '';
   });
   // 题型勾选变化时自动重新生成
   ['cb-pw','cb-cw','cb-cf','cb-ti','cb-lk'].forEach(id => {
