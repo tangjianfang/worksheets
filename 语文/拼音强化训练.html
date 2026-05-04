@@ -148,10 +148,17 @@
     display: flex; flex-direction: column; align-items: center; gap: 1px;
     padding: 3px 2px;
   }
+  /* 拼音四线格 */
   .char-item .py-line {
-    width: 90px; border-bottom: 1px solid #999; height: 17px;
+    width: 90px; height: 24px;
+    background:
+      linear-gradient(#ccc, #ccc) 0 0/100% 1px no-repeat,
+      linear-gradient(#ccc, #ccc) 0 8px/100% 1px no-repeat,
+      linear-gradient(#ccc, #ccc) 0 16px/100% 1px no-repeat;
+    border-bottom: 1px solid #ccc;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
     font-family: "Times New Roman", serif; font-size: 11px;
-    color: #888; text-align: center;
+    color: #888; text-align: center; line-height: 24px;
   }
   .char-item .ch {
     font-family: "楷体","KaiTi",serif;
@@ -285,7 +292,13 @@
     .info-bar { color: #000 !important; }
     .info-fill { border-bottom-color: #000 !important; }
     .pinyin-item .py { color: #000 !important; }
-    .char-item .py-line { border-bottom-color: #000 !important; }
+    .char-item .py-line {
+      background:
+        linear-gradient(#bbb, #bbb) 0 0/100% 1px no-repeat,
+        linear-gradient(#bbb, #bbb) 0 8px/100% 1px no-repeat,
+        linear-gradient(#bbb, #bbb) 0 16px/100% 1px no-repeat !important;
+      border-bottom-color: #bbb !important;
+    }
     .tian-py { color: #333 !important; }
     .tian-box { border-color: #888; }
     .confuse-block-title { background: #e8e8e8 !important; color: #000 !important; border-color: #888 !important; }

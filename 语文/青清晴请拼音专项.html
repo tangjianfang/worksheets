@@ -77,11 +77,18 @@
     display: flex; flex-direction: column; align-items: center; gap: 2px;
     padding: 4px 2px;
   }
+  /* 拼音四线格 */
   .py-line {
-    width: 86px; border-bottom: 1.5px solid #999; height: 22px;
+    width: 86px; height: 33px;
+    background:
+      linear-gradient(#ccc, #ccc) 0 0/100% 1px no-repeat,
+      linear-gradient(#ccc, #ccc) 0 11px/100% 1px no-repeat,
+      linear-gradient(#ccc, #ccc) 0 22px/100% 1px no-repeat;
+    border-bottom: 1px solid #ccc;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
     font-family: "Times New Roman", serif; font-size: 13px;
-    color: #1565c0; text-align: center; line-height: 22px;
-    letter-spacing: 1px;
+    color: transparent; text-align: center;
+    line-height: 33px; letter-spacing: 1px;
   }
   .py-line.show { color: #c62828; }
   .word-ch {
@@ -122,7 +129,14 @@
     body { background: none; padding: 0; }
     #controls, #answer-section { display: none !important; }
     #a4-page { width: 100%; box-shadow: none; padding: 0; min-height: auto; }
-    .py-line { color: transparent !important; border-bottom-color: #000 !important; }
+    .py-line {
+      color: transparent !important;
+      background:
+        linear-gradient(#bbb, #bbb) 0 0/100% 1px no-repeat,
+        linear-gradient(#bbb, #bbb) 0 11px/100% 1px no-repeat,
+        linear-gradient(#bbb, #bbb) 0 22px/100% 1px no-repeat !important;
+      border-bottom-color: #bbb !important;
+    }
     .py-line.show { color: transparent !important; }
     .page-title { color: #000 !important; }
     .page-header { border-bottom-color: #000 !important; }
