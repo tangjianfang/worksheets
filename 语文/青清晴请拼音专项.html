@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>看词语·注拼音 专项练习</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "楷体","KaiTi","SimSun",serif;
+    background: #f0f4f8;
+    padding: 16px;
+  }
+
+  /* ===== 控制栏（打印时隐藏） ===== */
+  #controls {
+    max-width: 210mm;
+    margin: 0 auto 12px;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  #controls button {
+    padding: 6px 18px; border: none; border-radius: 4px;
+    font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  #btn-check  { background: #1565c0; color: #fff; }
+  #btn-check:hover  { background: #0d47a1; }
+  #btn-print  { background: #43a047; color: #fff; }
+  #btn-print:hover  { background: #2e7d32; }
+  #btn-shuffle { background: #e65100; color: #fff; }
+  #btn-shuffle:hover { background: #bf360c; }
+  .ctrl-tip { font-size: 12px; color: #888; font-family: "微软雅黑",sans-serif; }
+
+  /* ===== A4 页面 ===== */
+  #a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    padding: 12mm 12mm 10mm;
+    display: flex; flex-direction: column;
+  }
+
+  /* ===== 页眉 ===== */
+  .page-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 2px solid #1565c0; padding-bottom: 5px; margin-bottom: 10px;
+  }
+  .page-title {
+    font-size: 18px; font-weight: bold; color: #1565c0;
+    font-family: "黑体","SimHei",sans-serif; letter-spacing: 2px;
+  }
+  .page-meta {
+    font-size: 11px; color: #888; font-family: "微软雅黑",sans-serif;
+    display: flex; gap: 16px;
+  }
+  .page-meta span { border-bottom: 1px solid #ccc; padding: 0 20px 1px; }
+
+  /* ===== 说明 ===== */
+  .instruction {
+    font-size: 12px; color: #555;
+    font-family: "微软雅黑",sans-serif;
+    background: #e3f2fd; border-left: 3px solid #1565c0;
+    padding: 4px 10px; margin-bottom: 10px; border-radius: 0 3px 3px 0;
+  }
+
+  /* ===== 词语网格 ===== */
+  .word-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px 10px;
+    flex: 1;
+  }
+  .word-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 4px 2px;
+  }
+  .py-line {
+    width: 86px; border-bottom: 1.5px solid #999; height: 22px;
+    font-family: "Times New Roman", serif; font-size: 13px;
+    color: #1565c0; text-align: center; line-height: 22px;
+    letter-spacing: 1px;
+  }
+  .py-line.show { color: #c62828; }
+  .word-ch {
+    font-family: "楷体","KaiTi",serif;
+    font-size: 26px; color: #000; line-height: 1.2; letter-spacing: 4px;
+  }
+  .item-num {
+    font-size: 9px; color: #ccc;
+    font-family: "微软雅黑",sans-serif;
+  }
+
+  /* ===== 答案区（打印时隐藏） ===== */
+  #answer-section {
+    margin-top: 12px; background: #fffde7;
+    border: 1px solid #f9a825; border-radius: 4px;
+    padding: 8px 12px; font-size: 12px;
+    display: none;
+    font-family: "微软雅黑",sans-serif;
+  }
+  #answer-section.visible { display: block; }
+  #answer-section h3 { color: #e65100; font-size: 13px; margin-bottom: 6px; }
+  .ans-grid { display: flex; flex-wrap: wrap; gap: 5px 16px; }
+  .ans-item { display: flex; gap: 4px; align-items: baseline; }
+  .ans-word { font-family: "楷体","KaiTi",serif; font-size: 14px; }
+  .ans-py { font-family: "Times New Roman",serif; font-size: 11px; color: #555; }
+
+  /* ===== 页脚 ===== */
+  .page-footer {
+    text-align: center; font-size: 10px; color: #bbb;
+    margin-top: auto; padding-top: 6px;
+    border-top: 1px dashed #ddd;
+    font-family: "微软雅黑",sans-serif;
+  }
+
+  /* ===== 打印 ===== */
+  @media print {
+    @page { size: A4 portrait; margin: 8mm 10mm; }
+    body { background: none; padding: 0; }
+    #controls, #answer-section { display: none !important; }
+    #a4-page { width: 100%; box-shadow: none; padding: 0; min-height: auto; }
+    .py-line { color: transparent !important; border-bottom-color: #000 !important; }
+    .py-line.show { color: transparent !important; }
+    .page-title { color: #000 !important; }
+    .page-header { border-bottom-color: #000 !important; }
+    .page-meta span { border-bottom-color: #000 !important; color: #000 !important; }
+    .instruction { background: #f0f0f0 !important; border-left-color: #000 !important; color: #000 !important; }
+    .page-footer { color: #444 !important; border-top-color: #aaa !important; }
+    .word-ch { color: #000 !important; }
+    .item-num { color: #777 !important; }
+  }
+  /* ===== 手机端适配 ===== */
+  @media screen and (max-width: 820px) {
+    body { padding: 8px; }
+    #controls { max-width: 100%; }
+    #a4-page { margin: 0 auto; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <button id="btn-check">显示/隐藏答案</button>
+  <button id="btn-shuffle">重新排列</button>
+  <button id="btn-print">打印练习</button>
+  <span class="ctrl-tip">共 <strong id="total-count">0</strong> 组词语 · 看词语在横线上写拼音</span>
+</div>
+
+<div id="a4-page">
+  <div class="page-header">
+    <div class="page-title">看词语 · 注拼音</div>
+    <div class="page-meta">
+      <span>姓名：</span>
+      <span>日期：</span>
+      <span>得分：</span>
+    </div>
+  </div>
+
+  <div class="instruction">
+    ★ 看清每个词语，在上方横线处用铅笔写出正确拼音，注意声调符号。
+  </div>
+
+  <div class="word-grid" id="word-grid"></div>
+
+  <div class="page-footer">一年级语文 · 专项拼音练习 · 青/清/晴/请 等易混字词</div>
+</div>
+
+<div id="answer-section">
+  <h3>参考答案</h3>
+  <div class="ans-grid" id="ans-grid"></div>
+</div>
+
+<script>
+const DATA = [
+  {p:'qīng',  w:'青草'},
+  {p:'qīng',  w:'清水'},
+  {p:'qíng',  w:'晴天'},
+  {p:'qǐng',  w:'请问'},
+  {p:'piàn',  w:'卡片'},
+  {p:'dǎng',  w:'党员'},
+  {p:'de',    w:'是的'},
+  {p:'běi',   w:'北京'},
+  {p:'dāng',  w:'当心'},
+  {p:'qiān',  w:'千万'},
+  {p:'dīng',  w:'丁香'},
+  {p:'dàn',   w:'元旦'},
+  {p:'qián',  w:'前后'},
+  {p:'dì',    w:'土地'},
+  {p:'bǎ',    w:'火把'},
+  {p:'diàn',  w:'闪电'},
+  {p:'duì',   w:'对方'},
+  {p:'dǎ',    w:'打开'},
+  {p:'pí',    w:'牛皮'},
+  {p:'pǎo',   w:'长跑'},
+  {p:'zú',    w:'手足'},
+  {p:'bāo',   w:'书包'},
+  {p:'bǎo',   w:'吃饱'},
+  {p:'bào',   w:'拥抱'},
+  {p:'bèi',   w:'宝贝'},
+  {p:'qì',    w:'生气'},
+];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let current = DATA.slice();
+let showAnswer = false;
+
+function render() {
+  const grid = document.getElementById('word-grid');
+  grid.innerHTML = '';
+  current.forEach((d, i) => {
+    const item = document.createElement('div');
+    item.className = 'word-item';
+    const line = document.createElement('div');
+    line.className = 'py-line' + (showAnswer ? ' show' : '');
+    line.textContent = showAnswer ? d.p : '';
+    const ch = document.createElement('div');
+    ch.className = 'word-ch';
+    ch.textContent = d.w;
+    const num = document.createElement('div');
+    num.className = 'item-num';
+    num.textContent = i + 1;
+    item.append(line, ch, num);
+    grid.appendChild(item);
+  });
+  document.getElementById('total-count').textContent = current.length;
+
+  // 答案区
+  const ansGrid = document.getElementById('ans-grid');
+  ansGrid.innerHTML = '';
+  current.forEach(d => {
+    const item = document.createElement('div'); item.className = 'ans-item';
+    const w = document.createElement('span'); w.className = 'ans-word'; w.textContent = d.w;
+    const p = document.createElement('span'); p.className = 'ans-py'; p.textContent = d.p;
+    item.append(w, document.createTextNode('：'), p);
+    ansGrid.appendChild(item);
+  });
+}
+
+document.getElementById('btn-check').addEventListener('click', () => {
+  showAnswer = !showAnswer;
+  document.getElementById('answer-section').classList.toggle('visible', showAnswer);
+  render();
+});
+
+document.getElementById('btn-shuffle').addEventListener('click', () => {
+  current = shuffle(DATA);
+  render();
+});
+
+document.getElementById('btn-print').addEventListener('click', () => {
+  showAnswer = false;
+  document.getElementById('answer-section').classList.remove('visible');
+  render();
+  window.print();
+});
+
+render();
+</script>
+</body>
+</html>

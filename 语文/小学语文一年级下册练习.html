@@ -172,9 +172,21 @@
     body { background: none; }
     #controls { display: none !important; }
     #page-wrapper { padding: 0; display: block; }
-    #a4-page {
-      width: 100%; min-height: auto; height: 281mm;
-      box-shadow: none; padding: 0;
+    #a4-page { width: 100%; min-height: auto; height: 281mm; box-shadow: none; padding: 0; }
+    .page-title { color: #000 !important; border-bottom-color: #000 !important; }
+    .info-bar { color: #000 !important; }
+    .info-fill { border-bottom-color: #000 !important; }
+    .tian-py { color: #333 !important; }
+    .tian-box { border-color: #888; }
+    .footer { color: #444 !important; }
+    .tip { color: #444; }
+  }
+  /* ===== 手机端适配 ===== */
+  @media screen and (max-width: 820px) {
+    #controls { position: relative; }
+    #page-wrapper {
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      padding: 8px 0 24px; justify-content: flex-start;
     }
   }
 </style>

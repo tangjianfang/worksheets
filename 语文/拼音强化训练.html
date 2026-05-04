@@ -1,0 +1,895 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>小学语文一年级 · 拼音难点强化训练</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "宋体", "SimSun", serif; background: #eef2f7; font-size: 14px; }
+
+  /* ===== 控制栏 ===== */
+  #controls {
+    position: sticky; top: 0; z-index: 20;
+    background: #1565c0; color: #fff;
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  }
+  #controls h1 { font-size: 14px; white-space: nowrap; }
+  .ctrl-group { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .ctrl-group label {
+    display: flex; align-items: center; gap: 3px; cursor: pointer;
+    user-select: none; white-space: nowrap;
+  }
+  .ctrl-group input[type="checkbox"] { accent-color: #ffeb3b; }
+  .sep { width: 1px; height: 22px; background: rgba(255,255,255,.35); flex-shrink: 0; }
+  #controls button {
+    padding: 5px 12px; font-size: 12px; border: none; border-radius: 4px;
+    cursor: pointer; font-weight: bold; font-family: inherit; white-space: nowrap;
+  }
+  #controls button:hover { opacity: .85; }
+  #btn-lessons  { background: #fff3e0; color: #e65100; }
+  #btn-generate { background: #ffeb3b; color: #1a237e; }
+  #btn-answer   { background: #e8f5e9; color: #2e7d32; }
+  #btn-print    { background: #f57c00; color: #fff; }
+
+  /* ===== 课文选择面板 ===== */
+  #lesson-panel {
+    display: none;
+    position: sticky; top: 43px; z-index: 19;
+    background: #fff; border-bottom: 2px solid #1565c0;
+    padding: 8px 16px 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,.15);
+  }
+  #lesson-panel.open { display: block; }
+  .lp-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px; font-size: 12px; color: #555;
+  }
+  .lp-header strong { color: #1565c0; font-size: 13px; }
+  .lp-header button {
+    padding: 3px 10px; font-size: 11px; border: 1px solid #1565c0;
+    border-radius: 3px; cursor: pointer; background: #e3f2fd; color: #1565c0;
+    font-family: inherit;
+  }
+  .lp-header button:hover { background: #1565c0; color: #fff; }
+  .lp-groups { display: flex; gap: 14px; flex-wrap: wrap; }
+  .lp-group { min-width: 140px; }
+  .lp-group-title {
+    font-size: 11px; font-weight: bold; color: #1565c0;
+    border-bottom: 1px solid #90caf9; padding-bottom: 3px; margin-bottom: 4px;
+  }
+  .lp-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; color: #333; padding: 1px 0; cursor: pointer;
+    user-select: none;
+  }
+  .lp-item input { accent-color: #1565c0; }
+  #selected-count { color: #ffeb3b; font-weight: bold; font-size: 12px; }
+
+  /* ===== A4 页面 ===== */
+  #page-wrapper { display: flex; justify-content: center; padding: 20px 0 36px; }
+  #a4-page {
+    width: 210mm; background: #fff;
+    padding: 8mm 10mm 6mm;
+    box-shadow: 0 3px 18px rgba(0,0,0,.22);
+    display: flex; flex-direction: column;
+  }
+
+  /* ===== 页头 ===== */
+  .page-title {
+    text-align: center; font-size: 17px; font-weight: bold;
+    letter-spacing: 2px; padding-bottom: 3px;
+    border-bottom: 2px solid #1565c0; margin-bottom: 2px;
+  }
+  .page-subtitle {
+    text-align: center; font-size: 11px; color: #1565c0;
+    padding: 1px 0 4px; letter-spacing: 1px; line-height: 1.4;
+  }
+  .info-bar {
+    display: flex; justify-content: space-between;
+    padding: 4px 2px 5px; font-size: 12px; color: #555;
+    border-bottom: 1px dashed #ccc; margin-bottom: 4px;
+  }
+  .info-fill {
+    display: inline-block; width: 70px;
+    border-bottom: 1px solid #999; margin: 0 3px; height: 16px;
+    vertical-align: bottom;
+  }
+
+  /* ===== 通用区块 ===== */
+  .section { margin-top: 7px; }
+  .section-title {
+    font-weight: bold; font-size: 12px;
+    padding: 2px 7px; margin-bottom: 5px;
+    color: #fff; background: #1565c0;
+    border-radius: 2px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .section-title .tip {
+    font-size: 10px; color: rgba(255,255,255,.85); font-weight: normal;
+  }
+
+  /* ===== 一、看拼音写词语 ===== */
+  .pinyin-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px 8px;
+  }
+  .pinyin-item {
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    padding: 3px 2px;
+  }
+  .pinyin-item .py {
+    font-family: "Times New Roman", serif;
+    font-size: 12px; color: #1565c0; letter-spacing: 0px;
+    min-height: 18px; text-align: center; white-space: nowrap;
+  }
+  .write-pair { display: flex; gap: 3px; }
+  .pinyin-item .write-box {
+    width: 30px; height: 30px;
+    border: 1px solid #999;
+    background:
+      linear-gradient(to right,  transparent calc(50%-.5px),#ddd calc(50%-.5px),#ddd calc(50%+.5px),transparent calc(50%+.5px)),
+      linear-gradient(to bottom, transparent calc(50%-.5px),#ddd calc(50%-.5px),#ddd calc(50%+.5px),transparent calc(50%+.5px));
+  }
+  .pinyin-item .num { font-size: 9px; color: #bbb; }
+
+  /* ===== 二、看词语注拼音 ===== */
+  .char-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px 8px;
+  }
+  .char-item {
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    padding: 3px 2px;
+  }
+  .char-item .py-line {
+    width: 90px; border-bottom: 1px solid #999; height: 17px;
+    font-family: "Times New Roman", serif; font-size: 11px;
+    color: #888; text-align: center;
+  }
+  .char-item .ch {
+    font-family: "楷体","KaiTi",serif;
+    font-size: 22px; color: #000; line-height: 1.15; letter-spacing: 4px;
+  }
+  .char-item .num { font-size: 9px; color: #bbb; }
+
+  /* ===== 三、易混淆辨析 ===== */
+  .confuse-outer { display: flex; gap: 8px; flex-wrap: wrap; }
+  .confuse-block { flex: 1; min-width: 120px; }
+  .confuse-block-title {
+    font-size: 11px; font-weight: bold; text-align: center;
+    padding: 2px 4px; border-radius: 2px; margin-bottom: 4px;
+    font-family: "Times New Roman",serif;
+    background: #e3f2fd; color: #1565c0;
+    border: 1px solid #90caf9;
+  }
+  .confuse-list {
+    display: grid; grid-template-columns: repeat(2,1fr); gap: 2px;
+  }
+  .confuse-item {
+    display: flex; align-items: center; gap: 3px;
+    padding: 2px 3px; border-bottom: 1px dashed #eee; font-size: 12px;
+  }
+  .confuse-item .ci-ch {
+    font-family: "楷体","KaiTi",serif;
+    font-size: 14px; min-width: 32px; letter-spacing: 2px;
+  }
+  .confuse-item .ci-py {
+    font-family: "Times New Roman",serif;
+    font-size: 11px; color: #555;
+  }
+
+  /* ===== 四、田字格练写 ===== */
+  .tian-row {
+    display: grid;
+    grid-template-columns: 18px repeat(6, 1fr);
+    gap: 0 4px;
+    margin-bottom: 4px;
+    align-items: stretch;
+  }
+  .tian-num { font-size: 9px; color: #bbb; padding-top: 16px; }
+  .tian-cell { display: flex; flex-direction: column; }
+  .tian-py {
+    text-align: center;
+    font-family: "Times New Roman",serif;
+    color: #1565c0; font-size: 11px;
+    min-height: 14px; padding: 1px 0;
+  }
+  .tian-box {
+    height: 12mm;
+    border: 1px solid #aaa;
+    background:
+      linear-gradient(to right,  transparent calc(50%-.5px),#ccc calc(50%-.5px),#ccc calc(50%+.5px),transparent calc(50%+.5px)),
+      linear-gradient(to bottom, transparent calc(50%-.5px),#ccc calc(50%-.5px),#ccc calc(50%+.5px),transparent calc(50%+.5px));
+    background-size: 3px 100%,100% 3px;
+    background-position: center,center;
+    background-repeat: repeat-x,repeat-y;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tian-char {
+    color: #d8d8d8; font-size: 28px; line-height: 1;
+    font-family: "楷体","KaiTi",serif;
+  }
+
+  /* ===== 五、拼读连线 ===== */
+  .link-wrap {
+    display: flex; justify-content: space-around; align-items: flex-start;
+  }
+  .link-col {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .link-item-py {
+    font-family: "Times New Roman",serif;
+    font-size: 12px; color: #1565c0; padding: 3px 8px;
+    border: 1px solid #90caf9; border-radius: 3px;
+    min-width: 100px; text-align: center; white-space: nowrap;
+  }
+  .link-item-ch {
+    font-family: "楷体","KaiTi",serif;
+    font-size: 16px; color: #000; padding: 3px 8px;
+    border: 1px solid #ccc; border-radius: 3px;
+    min-width: 52px; text-align: center; letter-spacing: 3px;
+  }
+  .link-middle {
+    display: flex; flex-direction: column;
+    justify-content: space-around; gap: 6px;
+    padding: 0 8px; align-items: center;
+  }
+  .link-dash { width: 60px; border-bottom: 1px dashed #bbb; }
+
+  /* ===== 页脚 ===== */
+  .footer {
+    text-align: center; font-size: 10px; color: #aaa;
+    padding-top: 5px; margin-top: auto;
+    border-top: 1px dashed #ddd;
+  }
+
+  /* ===== 空状态提示 ===== */
+  #empty-tip {
+    text-align: center; color: #999; font-size: 14px;
+    padding: 40px 0; display: none;
+  }
+  #empty-tip.show { display: block; }
+
+  /* ===== 答案区 ===== */
+  #answer-section {
+    margin: 12px auto; width: 210mm;
+    background: #fffde7; border: 1px solid #f9a825;
+    border-radius: 5px; padding: 10px 16px; font-size: 12px;
+    display: none;
+  }
+  #answer-section.visible { display: block; }
+  #answer-section h3 { color: #f57c00; margin-bottom: 6px; font-size: 13px; }
+  .ans-grid { display: flex; flex-wrap: wrap; gap: 5px 12px; }
+  .ans-item { display: flex; gap: 3px; align-items: baseline; }
+  .ans-ch { font-family: "楷体","KaiTi",serif; font-size: 15px; }
+  .ans-py { font-family: "Times New Roman",serif; font-size: 11px; color: #555; }
+
+  /* ===== 打印 ===== */
+  @media print {
+    @page { size: A4 portrait; margin: 7mm 9mm; }
+    body { background: none; }
+    #controls, #lesson-panel, #answer-section { display: none !important; }
+    #page-wrapper { padding: 0; display: block; }
+    #a4-page { width: 100%; box-shadow: none; padding: 0; }
+    /* 将蓝色标题改为黑色，确保打印清晰 */
+    .section-title { background: #000 !important; color: #fff !important; }
+    .page-title { color: #000 !important; border-bottom-color: #000 !important; }
+    .page-subtitle { color: #333 !important; }
+    .info-bar { color: #000 !important; }
+    .info-fill { border-bottom-color: #000 !important; }
+    .pinyin-item .py { color: #000 !important; }
+    .char-item .py-line { border-bottom-color: #000 !important; }
+    .tian-py { color: #333 !important; }
+    .tian-box { border-color: #888; }
+    .confuse-block-title { background: #e8e8e8 !important; color: #000 !important; border-color: #888 !important; }
+    .link-item-py { color: #000 !important; border-color: #888 !important; }
+    .link-item-ch { border-color: #888 !important; }
+    .footer { color: #444 !important; }
+    .write-box { border-color: #888; }
+  }
+  /* ===== 手机端适配 ===== */
+  @media screen and (max-width: 820px) {
+    #controls { position: relative; }
+    #lesson-panel { position: relative; top: 0; }
+    #page-wrapper {
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      padding: 8px 0 24px; justify-content: flex-start;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- 控制栏 -->
+<div id="controls">
+  <h1>拼音难点训练</h1>
+  <div class="sep"></div>
+  <button id="btn-lessons">📚 选择课文 <span id="selected-count">（0）</span></button>
+  <div class="sep"></div>
+  <div class="ctrl-group">
+    <label><input type="checkbox" id="cb-pw" checked /> 看拼音写字</label>
+    <label><input type="checkbox" id="cb-cw" checked /> 汉字注拼音</label>
+    <label><input type="checkbox" id="cb-cf" checked /> 易混辨析</label>
+    <label><input type="checkbox" id="cb-ti" checked /> 田字格</label>
+    <label><input type="checkbox" id="cb-lk" checked /> 拼读连线</label>
+  </div>
+  <div class="sep"></div>
+  <button id="btn-generate">⟳ 重新生成</button>
+  <button id="btn-answer">👁 查看答案</button>
+  <button id="btn-print">🖨 打印</button>
+</div>
+
+<!-- 课文选择面板 -->
+<div id="lesson-panel">
+  <div class="lp-header">
+    <strong>选择课文范围（可多选）</strong>
+    <button id="btn-select-all">全选</button>
+    <button id="btn-select-none">全不选</button>
+    <span style="color:#999;">· 将从勾选课文的识字中自动出题</span>
+  </div>
+  <div class="lp-groups" id="lp-groups"></div>
+</div>
+
+<!-- A4页面 -->
+<div id="page-wrapper">
+  <div id="a4-page">
+    <div class="page-title">语文一年级下册 · 拼音难点强化训练</div>
+    <div class="page-subtitle" id="page-subtitle">课文：—</div>
+    <div class="info-bar">
+      <span>姓名：<span class="info-fill"></span></span>
+      <span>班级：<span class="info-fill"></span></span>
+      <span>日期：<span class="info-fill" style="width:95px;"></span></span>
+      <span>得分：<span class="info-fill" style="width:55px;"></span></span>
+    </div>
+    <div id="empty-tip">请先点击上方「选择课文」按钮勾选课文，再点击「重新生成」</div>
+    <div id="content"></div>
+    <div class="footer">人教版一年级下册 · 拼音难点强化训练 · 加油！</div>
+  </div>
+</div>
+
+<!-- 答案区 -->
+<div id="answer-section">
+  <h3>参考答案（打印时自动隐藏）</h3>
+  <div class="ans-grid" id="ans-grid"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+   * 课文识字表（人教版一年级下册写字表）
+   * ============================================================ */
+  const UNITS = [
+    { id:'sz1',  group:'识字', name:'识字1·春夏秋冬', words:[
+      {h:'春',p:'chūn'},{h:'冬',p:'dōng'},{h:'吹',p:'chuī'},
+      {h:'花',p:'huā'},{h:'飞',p:'fēi'},{h:'入',p:'rù'}
+    ]},
+    { id:'sz2',  group:'识字', name:'识字2·姓氏歌', words:[
+      {h:'什',p:'shén'},{h:'么',p:'me'},{h:'古',p:'gǔ'},
+      {h:'胡',p:'hú'},{h:'双',p:'shuāng'},{h:'言',p:'yán'}
+    ]},
+    { id:'sz3',  group:'识字', name:'识字3·小青蛙', words:[
+      {h:'青',p:'qīng'},{h:'清',p:'qīng'},{h:'晴',p:'qíng'},
+      {h:'苗',p:'miáo'},{h:'请',p:'qǐng'},{h:'生',p:'shēng'}
+    ]},
+    { id:'sz4',  group:'识字', name:'识字4·猜字谜', words:[
+      {h:'字',p:'zì'},{h:'红',p:'hóng'},{h:'动',p:'dòng'},
+      {h:'万',p:'wàn'},{h:'无',p:'wú'},{h:'明',p:'míng'}
+    ]},
+    { id:'yd1',  group:'园地', name:'语文园地一', words:[
+      {h:'文',p:'wén'},{h:'卡',p:'kǎ'},{h:'片',p:'piàn'},{h:'合',p:'hé'}
+    ]},
+    { id:'k1',   group:'课文', name:'课文1·热爱中国共产党', words:[
+      {h:'共',p:'gòng'},{h:'产',p:'chǎn'},{h:'党',p:'dǎng'},
+      {h:'太',p:'tài'},{h:'阳',p:'yáng'},{h:'光',p:'guāng'}
+    ]},
+    { id:'k2',   group:'课文', name:'课文2·吃水不忘挖井人', words:[
+      {h:'井',p:'jǐng'},{h:'主',p:'zhǔ'},{h:'江',p:'jiāng'},
+      {h:'住',p:'zhù'},{h:'方',p:'fāng'},{h:'后',p:'hòu'}
+    ]},
+    { id:'k3',   group:'课文', name:'课文3·我多想去看看', words:[
+      {h:'告',p:'gào'},{h:'的',p:'de'},{h:'会',p:'huì'},
+      {h:'北',p:'běi'},{h:'京',p:'jīng'},{h:'广',p:'guǎng'}
+    ]},
+    { id:'yd2',  group:'园地', name:'语文园地二', words:[
+      {h:'写',p:'xiě'},{h:'认',p:'rèn'}
+    ]},
+    { id:'k4',   group:'课文', name:'课文4·小公鸡和小鸭子', words:[
+      {h:'走',p:'zǒu'},{h:'河',p:'hé'},{h:'说',p:'shuō'},
+      {h:'让',p:'ràng'},{h:'自',p:'zì'},{h:'己',p:'jǐ'}
+    ]},
+    { id:'k5',   group:'课文', name:'课文5·树和喜鹊', words:[
+      {h:'从',p:'cóng'},{h:'好',p:'hǎo'},{h:'们',p:'men'},
+      {h:'叫',p:'jiào'},{h:'他',p:'tā'},{h:'回',p:'huí'}
+    ]},
+    { id:'k6',   group:'课文', name:'课文6·怎么都快乐', words:[
+      {h:'快',p:'kuài'},{h:'乐',p:'lè'},{h:'当',p:'dāng'},
+      {h:'书',p:'shū'},{h:'画',p:'huà'},{h:'毛',p:'máo'}
+    ]},
+    { id:'k7',   group:'课文', name:'课文7·静夜思', words:[
+      {h:'思',p:'sī'},{h:'床',p:'chuáng'},{h:'前',p:'qián'},
+      {h:'地',p:'dì'},{h:'故',p:'gù'},{h:'乡',p:'xiāng'}
+    ]},
+    { id:'k8',   group:'课文', name:'课文8·夜色', words:[
+      {h:'色',p:'sè'},{h:'把',p:'bǎ'},{h:'讲',p:'jiǎng'},
+      {h:'样',p:'yàng'},{h:'笑',p:'xiào'},{h:'再',p:'zài'}
+    ]},
+    { id:'k9',   group:'课文', name:'课文9·端午粽', words:[
+      {h:'节',p:'jié'},{h:'米',p:'mǐ'},{h:'间',p:'jiān'},
+      {h:'分',p:'fēn'},{h:'吃',p:'chī'},{h:'肉',p:'ròu'}
+    ]},
+    { id:'yd3',  group:'园地', name:'语文园地三', words:[
+      {h:'止',p:'zhǐ'},{h:'斤',p:'jīn'},{h:'寸',p:'cùn'},
+      {h:'丁',p:'dīng'},{h:'千',p:'qiān'},{h:'旦',p:'dàn'}
+    ]},
+    { id:'yd4',  group:'园地', name:'语文园地四', words:[
+      {h:'册',p:'cè'},{h:'支',p:'zhī'},{h:'电',p:'diàn'},{h:'衣',p:'yī'}
+    ]},
+    { id:'sz5',  group:'识字', name:'识字5·动物儿歌', words:[
+      {h:'物',p:'wù'},{h:'造',p:'zào'},{h:'运',p:'yùn'},
+      {h:'欢',p:'huān'},{h:'房',p:'fáng'},{h:'网',p:'wǎng'}
+    ]},
+    { id:'sz6',  group:'识字', name:'识字6·古对今', words:[
+      {h:'对',p:'duì'},{h:'今',p:'jīn'},{h:'雪',p:'xuě'},
+      {h:'细',p:'xì'},{h:'夕',p:'xī'},{h:'语',p:'yǔ'}
+    ]},
+    { id:'sz7',  group:'识字', name:'识字7·操场上', words:[
+      {h:'打',p:'dǎ'},{h:'皮',p:'pí'},{h:'跑',p:'pǎo'},
+      {h:'足',p:'zú'},{h:'沙',p:'shā'},{h:'包',p:'bāo'}
+    ]},
+    { id:'sz8',  group:'识字', name:'识字8·人之初', words:[
+      {h:'近',p:'jìn'},{h:'习',p:'xí'},{h:'远',p:'yuǎn'},
+      {h:'学',p:'xué'},{h:'玉',p:'yù'},{h:'义',p:'yì'}
+    ]},
+    { id:'yd5',  group:'园地', name:'语文园地五', words:[
+      {h:'饱',p:'bǎo'},{h:'抱',p:'bào'}
+    ]},
+    { id:'k10',  group:'课文', name:'课文10·古诗二首', words:[
+      {h:'首',p:'shǒu'},{h:'池',p:'chí'},{h:'采',p:'cǎi'},
+      {h:'尖',p:'jiān'},{h:'角',p:'jiǎo'},{h:'早',p:'zǎo'}
+    ]},
+    { id:'k11',  group:'课文', name:'课文11·浪花', words:[
+      {h:'眼',p:'yǎn'},{h:'泪',p:'lèi'},{h:'它',p:'tā'},
+      {h:'贝',p:'bèi'},{h:'气',p:'qì'},{h:'娃',p:'wá'}
+    ]},
+    { id:'k12',  group:'课文', name:'课文12·荷叶圆圆', words:[
+      {h:'机',p:'jī'},{h:'台',p:'tái'},{h:'唱',p:'chàng'},
+      {h:'伞',p:'sǎn'},{h:'朵',p:'duǒ'},{h:'美',p:'měi'}
+    ]},
+    { id:'k13',  group:'课文', name:'课文13·要下雨了', words:[
+      {h:'这',p:'zhè'},{h:'看',p:'kàn'},{h:'鱼',p:'yú'},
+      {h:'面',p:'miàn'},{h:'问',p:'wèn'},{h:'加',p:'jiā'}
+    ]},
+    { id:'yd6',  group:'园地', name:'语文园地六', words:[
+      {h:'豆',p:'dòu'},{h:'斗',p:'dòu'}
+    ]},
+    { id:'k14',  group:'课文', name:'课文14·文具的家', words:[
+      {h:'笔',p:'bǐ'},{h:'知',p:'zhī'},{h:'道',p:'dào'},
+      {h:'放',p:'fàng'},{h:'平',p:'píng'},{h:'安',p:'ān'}
+    ]},
+    { id:'k15',  group:'课文', name:'课文15·一分钟', words:[
+      {h:'元',p:'yuán'},{h:'灯',p:'dēng'},{h:'车',p:'chē'},
+      {h:'站',p:'zhàn'},{h:'坐',p:'zuò'},{h:'老',p:'lǎo'},{h:'师',p:'shī'}
+    ]},
+    { id:'k16',  group:'课文', name:'课文16·动物王国开大会', words:[
+      {h:'国',p:'guó'},{h:'都',p:'dōu'},{h:'百',p:'bǎi'},
+      {h:'听',p:'tīng'},{h:'时',p:'shí'},{h:'点',p:'diǎn'},{h:'林',p:'lín'}
+    ]},
+    { id:'k17',  group:'课文', name:'课文17·小猴子下山', words:[
+      {h:'高',p:'gāo'},{h:'兴',p:'xìng'},{h:'着',p:'zhe'},
+      {h:'往',p:'wǎng'},{h:'瓜',p:'guā'},{h:'兔',p:'tù'},{h:'进',p:'jìn'}
+    ]},
+    { id:'yd7',  group:'园地', name:'语文园地七', words:[
+      {h:'巾',p:'jīn'},{h:'洗',p:'xǐ'}
+    ]},
+    { id:'k18',  group:'课文', name:'课文18·棉花姑娘', words:[
+      {h:'她',p:'tā'},{h:'空',p:'kōng'},{h:'还',p:'hái'},
+      {h:'干',p:'gān'},{h:'身',p:'shēn'},{h:'星',p:'xīng'},{h:'久',p:'jiǔ'}
+    ]},
+    { id:'k19',  group:'课文', name:'课文19·咕咚', words:[
+      {h:'吓',p:'xià'},{h:'为',p:'wèi'},{h:'怕',p:'pà'},
+      {h:'家',p:'jiā'},{h:'象',p:'xiàng'},{h:'没',p:'méi'},{h:'到',p:'dào'}
+    ]},
+    { id:'k20',  group:'课文', name:'课文20·小壁虎借尾巴', words:[
+      {h:'向',p:'xiàng'},{h:'边',p:'biān'},{h:'行',p:'xíng'},
+      {h:'草',p:'cǎo'},{h:'赶',p:'gǎn'},{h:'过',p:'guò'},{h:'找',p:'zhǎo'}
+    ]},
+    { id:'yd8',  group:'园地', name:'语文园地八', words:[
+      {h:'页',p:'yè'},{h:'户',p:'hù'},{h:'交',p:'jiāo'},{h:'父',p:'fù'}
+    ]}
+  ];
+
+  /* ============================================================
+   * 难点声母检测
+   * ============================================================ */
+  const DIFF_PAIRS = [
+    { key:'bp',  label:'b / p 易混',  initials:['b','p'] },
+    { key:'qj',  label:'q / j 易混',  initials:['q','j'] },
+    { key:'zhz', label:'翘舌/平舌',    initials:['zh','ch','sh','z','c','s'] },
+    { key:'dt',  label:'d / t 易混',  initials:['d','t'] },
+    { key:'nl',  label:'n / l 易混',  initials:['n','l'] },
+  ];
+
+  /* ============================================================
+   * 词语表：每个生字 → 常用2字词（词语 + 拼音）
+   * ============================================================ */
+  const WORD_MAP = {
+    '春':{w:'春天',p:'chūn tiān'},'冬':{w:'冬天',p:'dōng tiān'},'吹':{w:'吹风',p:'chuī fēng'},
+    '花':{w:'花朵',p:'huā duǒ'},'飞':{w:'飞机',p:'fēi jī'},'入':{w:'入门',p:'rù mén'},
+    '什':{w:'什么',p:'shén me'},'么':{w:'什么',p:'shén me'},'古':{w:'古代',p:'gǔ dài'},
+    '胡':{w:'胡子',p:'hú zi'},'双':{w:'双手',p:'shuāng shǒu'},'言':{w:'语言',p:'yǔ yán'},
+    '青':{w:'青草',p:'qīng cǎo'},'清':{w:'清水',p:'qīng shuǐ'},'晴':{w:'晴天',p:'qíng tiān'},
+    '苗':{w:'禾苗',p:'hé miáo'},'请':{w:'请问',p:'qǐng wèn'},'生':{w:'学生',p:'xué shēng'},
+    '字':{w:'写字',p:'xiě zì'},'红':{w:'红色',p:'hóng sè'},'动':{w:'运动',p:'yùn dòng'},
+    '万':{w:'万年',p:'wàn nián'},'无':{w:'无法',p:'wú fǎ'},'明':{w:'明天',p:'míng tiān'},
+    '文':{w:'语文',p:'yǔ wén'},'卡':{w:'卡片',p:'kǎ piàn'},'片':{w:'图片',p:'tú piàn'},
+    '合':{w:'合作',p:'hé zuò'},'共':{w:'共同',p:'gòng tóng'},'产':{w:'生产',p:'shēng chǎn'},
+    '党':{w:'党员',p:'dǎng yuán'},'太':{w:'太阳',p:'tài yáng'},'阳':{w:'阳光',p:'yáng guāng'},
+    '光':{w:'光明',p:'guāng míng'},'井':{w:'水井',p:'shuǐ jǐng'},'主':{w:'主人',p:'zhǔ rén'},
+    '江':{w:'长江',p:'cháng jiāng'},'住':{w:'住家',p:'zhù jiā'},'方':{w:'方法',p:'fāng fǎ'},
+    '后':{w:'以后',p:'yǐ hòu'},'告':{w:'告诉',p:'gào su'},'的':{w:'目的',p:'mù dì'},
+    '会':{w:'开会',p:'kāi huì'},'北':{w:'北方',p:'běi fāng'},'京':{w:'北京',p:'běi jīng'},
+    '广':{w:'广场',p:'guǎng chǎng'},'写':{w:'写字',p:'xiě zì'},'认':{w:'认识',p:'rèn shi'},
+    '走':{w:'走路',p:'zǒu lù'},'河':{w:'小河',p:'xiǎo hé'},'说':{w:'说话',p:'shuō huà'},
+    '让':{w:'让开',p:'ràng kāi'},'自':{w:'自己',p:'zì jǐ'},'己':{w:'自己',p:'zì jǐ'},
+    '从':{w:'从前',p:'cóng qián'},'好':{w:'好人',p:'hǎo rén'},'们':{w:'我们',p:'wǒ men'},
+    '叫':{w:'叫声',p:'jiào shēng'},'他':{w:'他们',p:'tā men'},'回':{w:'回家',p:'huí jiā'},
+    '快':{w:'快乐',p:'kuài lè'},'乐':{w:'快乐',p:'kuài lè'},'当':{w:'当心',p:'dāng xīn'},
+    '书':{w:'读书',p:'dú shū'},'画':{w:'图画',p:'tú huà'},'毛':{w:'毛笔',p:'máo bǐ'},
+    '思':{w:'思念',p:'sī niàn'},'床':{w:'床头',p:'chuáng tóu'},'前':{w:'前面',p:'qián miàn'},
+    '地':{w:'土地',p:'tǔ dì'},'故':{w:'故乡',p:'gù xiāng'},'乡':{w:'家乡',p:'jiā xiāng'},
+    '色':{w:'颜色',p:'yán sè'},'把':{w:'把手',p:'bǎ shǒu'},'讲':{w:'讲话',p:'jiǎng huà'},
+    '样':{w:'一样',p:'yī yàng'},'笑':{w:'微笑',p:'wēi xiào'},'再':{w:'再见',p:'zài jiàn'},
+    '节':{w:'节日',p:'jié rì'},'米':{w:'大米',p:'dà mǐ'},'间':{w:'中间',p:'zhōng jiān'},
+    '分':{w:'分开',p:'fēn kāi'},'吃':{w:'吃饭',p:'chī fàn'},'肉':{w:'牛肉',p:'niú ròu'},
+    '止':{w:'停止',p:'tíng zhǐ'},'斤':{w:'公斤',p:'gōng jīn'},'寸':{w:'一寸',p:'yī cùn'},
+    '丁':{w:'人丁',p:'rén dīng'},'千':{w:'千万',p:'qiān wàn'},'旦':{w:'元旦',p:'yuán dàn'},
+    '册':{w:'画册',p:'huà cè'},'支':{w:'一支',p:'yī zhī'},'电':{w:'电灯',p:'diàn dēng'},
+    '衣':{w:'衣服',p:'yī fú'},'物':{w:'动物',p:'dòng wù'},'造':{w:'造句',p:'zào jù'},
+    '运':{w:'运动',p:'yùn dòng'},'欢':{w:'喜欢',p:'xǐ huān'},'房':{w:'房子',p:'fáng zi'},
+    '网':{w:'网络',p:'wǎng luò'},'对':{w:'对错',p:'duì cuò'},'今':{w:'今天',p:'jīn tiān'},
+    '雪':{w:'白雪',p:'bái xuě'},'细':{w:'细心',p:'xì xīn'},'夕':{w:'夕阳',p:'xī yáng'},
+    '语':{w:'语文',p:'yǔ wén'},'打':{w:'打球',p:'dǎ qiú'},'皮':{w:'皮球',p:'pí qiú'},
+    '跑':{w:'跑步',p:'pǎo bù'},'足':{w:'足球',p:'zú qiú'},'沙':{w:'沙子',p:'shā zi'},
+    '包':{w:'书包',p:'shū bāo'},'近':{w:'附近',p:'fù jìn'},'习':{w:'学习',p:'xué xí'},
+    '远':{w:'远方',p:'yuǎn fāng'},'学':{w:'学校',p:'xué xiào'},'玉':{w:'玉米',p:'yù mǐ'},
+    '义':{w:'意义',p:'yì yì'},'饱':{w:'吃饱',p:'chī bǎo'},'抱':{w:'拥抱',p:'yōng bào'},
+    '首':{w:'一首',p:'yī shǒu'},'池':{w:'水池',p:'shuǐ chí'},'采':{w:'采花',p:'cǎi huā'},
+    '尖':{w:'尖角',p:'jiān jiǎo'},'角':{w:'牛角',p:'niú jiǎo'},'早':{w:'早上',p:'zǎo shàng'},
+    '眼':{w:'眼睛',p:'yǎn jīng'},'泪':{w:'眼泪',p:'yǎn lèi'},'它':{w:'它们',p:'tā men'},
+    '贝':{w:'贝壳',p:'bèi ké'},'气':{w:'空气',p:'kōng qì'},'娃':{w:'娃娃',p:'wá wa'},
+    '机':{w:'飞机',p:'fēi jī'},'台':{w:'讲台',p:'jiǎng tái'},'唱':{w:'唱歌',p:'chàng gē'},
+    '伞':{w:'雨伞',p:'yǔ sǎn'},'朵':{w:'花朵',p:'huā duǒ'},'美':{w:'美丽',p:'měi lì'},
+    '这':{w:'这里',p:'zhè lǐ'},'看':{w:'看见',p:'kàn jiàn'},'鱼':{w:'金鱼',p:'jīn yú'},
+    '面':{w:'前面',p:'qián miàn'},'问':{w:'问题',p:'wèn tí'},'加':{w:'加油',p:'jiā yóu'},
+    '豆':{w:'豆子',p:'dòu zi'},'斗':{w:'北斗',p:'běi dǒu'},'笔':{w:'毛笔',p:'máo bǐ'},
+    '知':{w:'知道',p:'zhī dào'},'道':{w:'知道',p:'zhī dào'},'放':{w:'放学',p:'fàng xué'},
+    '平':{w:'平安',p:'píng ān'},'安':{w:'平安',p:'píng ān'},'元':{w:'元旦',p:'yuán dàn'},
+    '灯':{w:'电灯',p:'diàn dēng'},'车':{w:'汽车',p:'qì chē'},'站':{w:'车站',p:'chē zhàn'},
+    '坐':{w:'坐下',p:'zuò xià'},'老':{w:'老师',p:'lǎo shī'},'师':{w:'老师',p:'lǎo shī'},
+    '国':{w:'中国',p:'zhōng guó'},'都':{w:'都是',p:'dōu shì'},'百':{w:'百分',p:'bǎi fēn'},
+    '听':{w:'听话',p:'tīng huà'},'时':{w:'时间',p:'shí jiān'},'点':{w:'地点',p:'dì diǎn'},
+    '林':{w:'树林',p:'shù lín'},'高':{w:'高兴',p:'gāo xìng'},'兴':{w:'高兴',p:'gāo xìng'},
+    '着':{w:'看着',p:'kàn zhe'},'往':{w:'前往',p:'qián wǎng'},'瓜':{w:'西瓜',p:'xī guā'},
+    '兔':{w:'兔子',p:'tù zi'},'进':{w:'前进',p:'qián jìn'},'巾':{w:'毛巾',p:'máo jīn'},
+    '洗':{w:'洗手',p:'xǐ shǒu'},'她':{w:'她们',p:'tā men'},'空':{w:'天空',p:'tiān kōng'},
+    '还':{w:'还有',p:'hái yǒu'},'干':{w:'干净',p:'gān jìng'},'身':{w:'身体',p:'shēn tǐ'},
+    '星':{w:'星星',p:'xīng xīng'},'久':{w:'很久',p:'hěn jiǔ'},'吓':{w:'吓人',p:'xià rén'},
+    '为':{w:'因为',p:'yīn wèi'},'怕':{w:'害怕',p:'hài pà'},'家':{w:'回家',p:'huí jiā'},
+    '象':{w:'大象',p:'dà xiàng'},'没':{w:'没有',p:'méi yǒu'},'到':{w:'到达',p:'dào dá'},
+    '向':{w:'方向',p:'fāng xiàng'},'边':{w:'边上',p:'biān shàng'},'行':{w:'行走',p:'xíng zǒu'},
+    '草':{w:'小草',p:'xiǎo cǎo'},'赶':{w:'追赶',p:'zhuī gǎn'},'过':{w:'走过',p:'zǒu guò'},
+    '找':{w:'寻找',p:'xún zhǎo'},'页':{w:'一页',p:'yī yè'},'户':{w:'门户',p:'mén hù'},
+    '交':{w:'交友',p:'jiāo yǒu'},'父':{w:'父亲',p:'fù qīn'}
+  };
+
+  function getInitial(py) {
+    if (/^zh/i.test(py)) return 'zh';
+    if (/^ch/i.test(py)) return 'ch';
+    if (/^sh/i.test(py)) return 'sh';
+    const m = py.match(/^([bpmfdtnlgkhjqxzcsryw])/i);
+    return m ? m[1].toLowerCase() : '';
+  }
+
+  /* ============================================================
+   * 工具函数
+   * ============================================================ */
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function pick(arr, n) { return shuffle(arr).slice(0, Math.min(n, arr.length)); }
+
+  /* ============================================================
+   * 构建课文选择面板
+   * ============================================================ */
+  const GROUP_ORDER = ['识字', '课文', '园地'];
+  const grouped = {};
+  UNITS.forEach(u => {
+    if (!grouped[u.group]) grouped[u.group] = [];
+    grouped[u.group].push(u);
+  });
+
+  const lpGroups = document.getElementById('lp-groups');
+  GROUP_ORDER.forEach(g => {
+    if (!grouped[g]) return;
+    const col = document.createElement('div');
+    col.className = 'lp-group';
+    const title = document.createElement('div');
+    title.className = 'lp-group-title';
+    title.textContent = g;
+    col.appendChild(title);
+    grouped[g].forEach(u => {
+      const lbl = document.createElement('label');
+      lbl.className = 'lp-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.value = u.id;
+      cb.addEventListener('change', updateCount);
+      lbl.appendChild(cb);
+      lbl.appendChild(document.createTextNode(' ' + u.name));
+      col.appendChild(lbl);
+    });
+    lpGroups.appendChild(col);
+  });
+
+  function getCheckedIds() {
+    return [...document.querySelectorAll('#lp-groups input[type=checkbox]:checked')]
+      .map(cb => cb.value);
+  }
+
+  function updateCount() {
+    const n = getCheckedIds().length;
+    document.getElementById('selected-count').textContent = '（' + n + '）';
+  }
+
+  document.getElementById('btn-select-all').addEventListener('click', () => {
+    document.querySelectorAll('#lp-groups input[type=checkbox]').forEach(cb => cb.checked = true);
+    updateCount();
+  });
+  document.getElementById('btn-select-none').addEventListener('click', () => {
+    document.querySelectorAll('#lp-groups input[type=checkbox]').forEach(cb => cb.checked = false);
+    updateCount();
+  });
+
+  document.getElementById('btn-lessons').addEventListener('click', () => {
+    document.getElementById('lesson-panel').classList.toggle('open');
+  });
+
+  /* ============================================================
+   * 生成练习题
+   * ============================================================ */
+  function generate() {
+    const ids = getCheckedIds();
+    const content = document.getElementById('content');
+    const emptyTip = document.getElementById('empty-tip');
+
+    if (ids.length === 0) {
+      content.innerHTML = '';
+      emptyTip.classList.add('show');
+      document.getElementById('page-subtitle').textContent = '请先选择课文';
+      document.getElementById('ans-grid').innerHTML = '';
+      document.getElementById('answer-section').classList.remove('visible');
+      return;
+    }
+    emptyTip.classList.remove('show');
+
+    // 汇总选中课文的字（以汉字去重）
+    const selectedUnits = UNITS.filter(u => ids.includes(u.id));
+    const shortNames = selectedUnits.map(u =>
+      u.name.replace(/^(识字|课文|语文)/, '').replace(/^园地/, '园地').slice(0, 8)
+    );
+    const nameStr = shortNames.join('、');
+    document.getElementById('page-subtitle').textContent =
+      '课文：' + (nameStr.length > 55 ? nameStr.slice(0, 53) + '…' : nameStr);
+
+    const charMap = {};
+    selectedUnits.forEach(u => u.words.forEach(w => { charMap[w.h] = w; }));
+    const allSingleChars = shuffle(Object.values(charMap));
+
+    // 转换为2字词语（去重同词）
+    const seenW = new Set();
+    const allPhrases = [];
+    allSingleChars.forEach(w => {
+      const wm = WORD_MAP[w.h];
+      const word = wm ? wm.w : w.h;
+      if (!seenW.has(word)) {
+        seenW.add(word);
+        allPhrases.push({ h: wm ? wm.w : w.h, p: wm ? wm.p : w.p, keyH: w.h, keyP: w.p });
+      }
+    });
+
+    // 更新答案区（显示词语）
+    const ansGrid = document.getElementById('ans-grid');
+    ansGrid.innerHTML = '';
+    allPhrases.forEach(w => {
+      const item = document.createElement('div'); item.className = 'ans-item';
+      const ch = document.createElement('span'); ch.className = 'ans-ch'; ch.textContent = w.h;
+      const py = document.createElement('span'); py.className = 'ans-py'; py.textContent = w.p;
+      item.append(ch, document.createTextNode('：'), py);
+      ansGrid.appendChild(item);
+    });
+    document.getElementById('answer-section').classList.remove('visible');
+
+    content.innerHTML = '';
+    let sn = 1;  // section number
+
+    // ── 一、看拼音写词语 ──
+    if (document.getElementById('cb-pw').checked) {
+      const words = pick(allPhrases, 8);
+      const sec = document.createElement('div'); sec.className = 'section';
+      const t = document.createElement('div'); t.className = 'section-title';
+      t.innerHTML = sn++ + '. 看拼音，写词语 <span class="tip">（根据拼音在格内写出对应词语）</span>';
+      sec.appendChild(t);
+      const grid = document.createElement('div'); grid.className = 'pinyin-grid';
+      words.forEach((w, i) => {
+        const item = document.createElement('div'); item.className = 'pinyin-item';
+        item.innerHTML =
+          '<div class="py">' + w.p + '</div>' +
+          '<div class="write-pair"><div class="write-box"></div><div class="write-box"></div></div>' +
+          '<div class="num">' + (i + 1) + '</div>';
+        grid.appendChild(item);
+      });
+      sec.appendChild(grid);
+      content.appendChild(sec);
+    }
+
+    // ── 二、看词语注拼音 ──
+    if (document.getElementById('cb-cw').checked) {
+      const words = pick(allPhrases, 8);
+      const sec = document.createElement('div'); sec.className = 'section';
+      const t = document.createElement('div'); t.className = 'section-title';
+      t.innerHTML = sn++ + '. 看词语，注拼音 <span class="tip">（在横线上注音，注意声调）</span>';
+      sec.appendChild(t);
+      const grid = document.createElement('div'); grid.className = 'char-grid';
+      words.forEach((w, i) => {
+        const item = document.createElement('div'); item.className = 'char-item';
+        item.innerHTML =
+          '<div class="py-line"></div>' +
+          '<div class="ch">' + w.h + '</div>' +
+          '<div class="num">' + (i + 1) + '</div>';
+        grid.appendChild(item);
+      });
+      sec.appendChild(grid);
+      content.appendChild(sec);
+    }
+
+    // ── 三、易混淆辨析（自动检测当前词库的难点，按关键字声母分组） ──
+    if (document.getElementById('cb-cf').checked) {
+      const activePairs = DIFF_PAIRS.filter(pair => {
+        const sidesWithWords = pair.initials.filter(ini =>
+          allPhrases.some(w => getInitial(w.keyP) === ini)
+        );
+        return sidesWithWords.length >= 2;
+      });
+
+      if (activePairs.length > 0) {
+        const sec = document.createElement('div'); sec.className = 'section';
+        const t = document.createElement('div'); t.className = 'section-title';
+        const tagHtml = activePairs.map(p =>
+          '<span style="background:rgba(255,255,255,.22);padding:0 5px;border-radius:8px;font-size:10px;">' + p.label + '</span>'
+        ).join(' ');
+        t.innerHTML = sn++ + '. 易混淆拼音辨析 <span class="tip">' + tagHtml + '</span>';
+        sec.appendChild(t);
+
+        const outer = document.createElement('div'); outer.className = 'confuse-outer';
+        activePairs.slice(0, 3).forEach(pair => {
+          const block = document.createElement('div'); block.className = 'confuse-block';
+          block.innerHTML = '<div class="confuse-block-title">' + pair.label + '</div>';
+          const list = document.createElement('div'); list.className = 'confuse-list';
+          pair.initials.forEach(ini => {
+            pick(allPhrases.filter(w => getInitial(w.keyP) === ini), 3).forEach(w => {
+              const item = document.createElement('div'); item.className = 'confuse-item';
+              item.innerHTML =
+                '<span class="ci-ch">' + w.h + '</span>' +
+                '<span class="ci-py">' + w.p + '</span>';
+              list.appendChild(item);
+            });
+          });
+          block.appendChild(list);
+          outer.appendChild(block);
+        });
+        sec.appendChild(outer);
+        content.appendChild(sec);
+      }
+    }
+
+    // ── 四、田字格练写（优先选难点声母词，以词语形式展示） ──
+    if (document.getElementById('cb-ti').checked) {
+      const difficultInitials = ['b','p','q','j','zh','ch','sh','z','c','s','d','t','n','l'];
+      const difficult = allPhrases.filter(w => difficultInitials.includes(getInitial(w.keyP)));
+      const pool = difficult.length >= 3 ? difficult : allPhrases;
+      const words = pick(pool, 3);
+
+      const sec = document.createElement('div'); sec.className = 'section';
+      const t = document.createElement('div'); t.className = 'section-title';
+      t.innerHTML = sn++ + '. 田字格练写 <span class="tip">（先看例字词，再在后面的格内描红并练写）</span>';
+      sec.appendChild(t);
+
+      words.forEach((w, idx) => {
+        const row = document.createElement('div'); row.className = 'tian-row';
+        const num = document.createElement('div'); num.className = 'tian-num';
+        num.textContent = idx + 1 + '.'; row.appendChild(num);
+        const chars = w.h.split('');
+        const pys = w.p.split(' ');
+        // 例字1（带拼音）
+        row.innerHTML += '<div class="tian-cell"><div class="tian-py">' + (pys[0]||w.p) + '</div>' +
+          '<div class="tian-box"><span class="tian-char">' + chars[0] + '</span></div></div>';
+        // 例字2（第二个字或空格）
+        row.innerHTML += '<div class="tian-cell"><div class="tian-py">' + (chars[1] ? (pys[1]||'') : '') + '</div>' +
+          '<div class="tian-box">' + (chars[1] ? '<span class="tian-char">' + chars[1] + '</span>' : '') + '</div></div>';
+        // 描红格（词语1+2）
+        row.innerHTML += '<div class="tian-cell"><div class="tian-py"></div>' +
+          '<div class="tian-box"><span class="tian-char" style="color:#ececec">' + chars[0] + '</span></div></div>';
+        row.innerHTML += '<div class="tian-cell"><div class="tian-py"></div>' +
+          '<div class="tian-box">' + (chars[1] ? '<span class="tian-char" style="color:#ececec">' + chars[1] + '</span>' : '') + '</div></div>';
+        // 空白格（2格）
+        for (let i = 0; i < 2; i++) {
+          row.innerHTML += '<div class="tian-cell"><div class="tian-py"></div><div class="tian-box"></div></div>';
+        }
+        sec.appendChild(row);
+      });
+      content.appendChild(sec);
+    }
+
+    // ── 五、拼读连线 ──
+    if (document.getElementById('cb-lk').checked && allPhrases.length >= 4) {
+      const selected = pick(allPhrases, Math.min(6, allPhrases.length));
+      const shuffledWords = shuffle(selected.map(w => w.h));
+
+      const sec = document.createElement('div'); sec.className = 'section';
+      const t = document.createElement('div'); t.className = 'section-title';
+      t.innerHTML = sn++ + '. 拼读连线 <span class="tip">（将左边拼音与右边词语用铅笔连起来）</span>';
+      sec.appendChild(t);
+
+      const wrap = document.createElement('div'); wrap.className = 'link-wrap';
+      const colL = document.createElement('div'); colL.className = 'link-col';
+      const colM = document.createElement('div'); colM.className = 'link-middle';
+      const colR = document.createElement('div'); colR.className = 'link-col';
+
+      selected.forEach(w => {
+        const p = document.createElement('div'); p.className = 'link-item-py';
+        p.textContent = w.p; colL.appendChild(p);
+        const d = document.createElement('div'); d.className = 'link-dash';
+        colM.appendChild(d);
+      });
+      shuffledWords.forEach(word => {
+        const c = document.createElement('div'); c.className = 'link-item-ch';
+        c.textContent = word; colR.appendChild(c);
+      });
+
+      wrap.appendChild(colL); wrap.appendChild(colM); wrap.appendChild(colR);
+      sec.appendChild(wrap);
+      content.appendChild(sec);
+    }
+  }
+
+  /* ============================================================
+   * 事件绑定
+   * ============================================================ */
+  document.getElementById('btn-generate').addEventListener('click', generate);
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+  document.getElementById('btn-answer').addEventListener('click', () => {
+    document.getElementById('answer-section').classList.toggle('visible');
+  });
+
+  // 默认选中含 b/p/q/j 典型难点的课文
+  ['sz3','sz7','k8','k9','k14','k19'].forEach(id => {
+    const cb = document.querySelector('#lp-groups input[value="' + id + '"]');
+    if (cb) { cb.checked = true; }
+  });
+  updateCount();
+  generate();
+})();
+</script>
+</body>
+</html>

@@ -158,30 +158,29 @@
 
     /* ===== 打印样式 ===== */
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 8mm 10mm;
-      }
+      @page { size: A4 portrait; margin: 8mm 10mm; }
       body { background: none; }
       #controls { display: none !important; }
-      #page-wrapper {
-        padding: 0;
-        display: block;
-      }
+      #page-wrapper { padding: 0; display: block; }
       #a4-page {
-        width: 100%;
-        /* 297mm - 2×8mm @page margin */
-        height: 281mm;
-        min-height: unset;
-        box-shadow: none;
-        padding: 0;
+        width: 100%; height: 281mm; min-height: unset;
+        box-shadow: none; padding: 0;
       }
-      .problem-cell {
-        border-color: #ccc;
-        /* 取消屏幕端 min-height，让行高由 grid 1fr 决定 */
-        min-height: 0;
+      .problem-cell { border-color: #aaa; min-height: 0; }
+      .page-title { color: #000 !important; border-bottom-color: #000 !important; }
+      .info-bar { color: #000 !important; }
+      .info-fill { border-bottom-color: #000 !important; }
+      .page-footer { color: #444 !important; border-top-color: #aaa; }
+      .problem-number { color: #555; }
+      .answer-line { border-bottom-color: #000; }
+    }
+    /* ===== 手机端适配 ===== */
+    @media screen and (max-width: 820px) {
+      #controls { position: relative; }
+      #page-wrapper {
+        overflow-x: auto; -webkit-overflow-scrolling: touch;
+        padding: 8px 0 24px; justify-content: flex-start;
       }
-      .page-footer { color: #aaa; }
     }
   </style>
 </head>
