@@ -741,21 +741,17 @@
       }
     });
 
-    // 更新答案区（显示词语）
+    // 更新答案区（生成完题后填入，先清空）
     const ansGrid = document.getElementById('ans-grid');
     ansGrid.innerHTML = '';
-    allPhrases.forEach(w => {
-      const item = document.createElement('div'); item.className = 'ans-item';
-      const ch = document.createElement('span'); ch.className = 'ans-ch'; ch.textContent = w.h;
-      const py = document.createElement('span'); py.className = 'ans-py'; py.textContent = w.p;
-      item.append(ch, document.createTextNode('：'), py);
-      ansGrid.appendChild(item);
-    });
     document.getElementById('answer-section').classList.remove('visible');
     document.getElementById('btn-answer').textContent = '👁 显示答案';
     document.getElementById('btn-answer').style.background = '';
     document.getElementById('btn-answer').style.color = '';
     document.getElementById('a4-page').classList.remove('show-answers');
+
+    // 用于收集各题用词，generate 结束后写入答案区
+    const answerSections = [];
 
     content.innerHTML = '';
     let sn = 1;  // section number
@@ -763,6 +759,7 @@
     // ── 一、看拼音写词语 ──
     if (document.getElementById('cb-pw').checked) {
       const words = pick(allPhrases, 8);
+      answerSections.push({ label: '一、看拼音写词语', words, fmt: w => w.p + ' → ' + w.h });
       const sec = document.createElement('div'); sec.className = 'section';
       const t = document.createElement('div'); t.className = 'section-title';
       t.innerHTML = sn++ + '. 看拼音，写词语 <span class="tip">（根据拼音在格内写出对应词语）</span>';
@@ -783,6 +780,7 @@
     // ── 二、看词语注拼音 ──
     if (document.getElementById('cb-cw').checked) {
       const words = pick(allPhrases, 8);
+      answerSections.push({ label: '二、看词语注拼音', words, fmt: w => w.h + ' → ' + w.p });
       const sec = document.createElement('div'); sec.className = 'section';
       const t = document.createElement('div'); t.className = 'section-title';
       t.innerHTML = sn++ + '. 看词语，注拼音 <span class="tip">（在横线上注音，注意声调）</span>';
@@ -846,6 +844,7 @@
       const difficult = allPhrases.filter(w => difficultInitials.includes(getInitial(w.keyP)));
       const pool = difficult.length >= 3 ? difficult : allPhrases;
       const words = pick(pool, 3);
+      answerSections.push({ label: '四、田字格练写', words, fmt: w => w.h + '（' + w.p + '）' });
 
       const sec = document.createElement('div'); sec.className = 'section';
       const t = document.createElement('div'); t.className = 'section-title';
@@ -881,6 +880,7 @@
     // ── 五、拼读连线 ──
     if (document.getElementById('cb-lk').checked && allPhrases.length >= 4) {
       const selected = pick(allPhrases, Math.min(6, allPhrases.length));
+      answerSections.push({ label: '五、拼读连线', words: selected, fmt: w => w.p + ' — ' + w.h });
       const shuffledWords = shuffle(selected.map(w => w.h));
 
       const sec = document.createElement('div'); sec.className = 'section';
@@ -908,6 +908,29 @@
       sec.appendChild(wrap);
       content.appendChild(sec);
     }
+
+    // ── 写入答案区 ──
+    answerSections.forEach(({ label, words, fmt }) => {
+      const group = document.createElement('div');
+      group.style.cssText = 'margin-bottom:8px;';
+      const heading = document.createElement('div');
+      heading.style.cssText = 'font-weight:bold;color:#e65100;font-size:12px;margin-bottom:4px;';
+      heading.textContent = label;
+      group.appendChild(heading);
+      const row = document.createElement('div'); row.className = 'ans-grid';
+      words.forEach((w, i) => {
+        const item = document.createElement('div'); item.className = 'ans-item';
+        const num = document.createElement('span');
+        num.style.cssText = 'color:#aaa;font-size:10px;margin-right:2px;';
+        num.textContent = (i + 1) + '.';
+        const ch = document.createElement('span'); ch.className = 'ans-ch';
+        ch.textContent = fmt(w);
+        item.append(num, ch);
+        row.appendChild(item);
+      });
+      group.appendChild(row);
+      ansGrid.appendChild(group);
+    });
   }
 
   /* ============================================================
