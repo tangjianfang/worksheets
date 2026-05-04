@@ -34,6 +34,8 @@
   #controls button:hover { opacity: .85; }
   #btn-generate { background: #ffeb3b; color: #1a237e; }
   #btn-print    { background: #f57c00; color: #fff; }
+  #btn-home { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.45); font-weight: normal; }
+  #btn-home:hover { background: rgba(255,255,255,.32); }
 
   /* ===== A4 页面 ===== */
   #page-wrapper { display: flex; justify-content: center; padding: 24px 0 40px; }
@@ -194,6 +196,8 @@
 <body>
 
 <div id="controls">
+  <a id="btn-home" href="../index.html" style="padding:6px 14px;font-size:13px;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);">&#8592; 首页</a>
+  <div class="sep"></div>
   <h1>语文一年级下册 单元练习</h1>
   <div class="sep"></div>
   <div class="ctrl-group">

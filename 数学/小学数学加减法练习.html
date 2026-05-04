@@ -64,6 +64,8 @@
     #controls button:hover { opacity: .85; }
     #btn-generate { background: #ffeb3b; color: #1a237e; }
     #btn-print    { background: #43a047; color: #fff; }
+    #btn-home { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.45); font-weight: normal; }
+    #btn-home:hover { background: rgba(255,255,255,.32); }
 
     /* ===== A4 练习页 ===== */
     #page-wrapper {
@@ -188,6 +190,8 @@
 
 <!-- 控制栏 -->
 <div id="controls">
+  <a id="btn-home" href="../index.html" style="padding:6px 14px;font-size:13px;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);">&#8592; 首页</a>
+  <div class="sep"></div>
   <h1>数学计算练习生成器</h1>
   <div class="sep"></div>
   <div class="radio-group">
