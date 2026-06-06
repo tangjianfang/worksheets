@@ -1,0 +1,361 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>家庭积分管理制度</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+      font-size: 14px;
+      color: #222;
+      background: #f0f4f8;
+    }
+
+    .container {
+      max-width: 210mm;
+      margin: 20px auto;
+      background: #fff;
+      padding: 18mm 16mm 14mm;
+      box-shadow: 0 2px 16px rgba(0,0,0,.12);
+    }
+
+    /* ─── 标题区 ─── */
+    .doc-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #1a237e;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .doc-subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .doc-divider {
+      border: none;
+      border-top: 2px solid #1a237e;
+      margin: 10px 0 18px;
+    }
+
+    /* ─── 章节标题 ─── */
+    .section-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: #1565c0;
+      border-left: 4px solid #1565c0;
+      padding-left: 8px;
+      margin: 20px 0 10px;
+    }
+
+    /* ─── 规则表格 ─── */
+    .rule-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .rule-table th {
+      background: #e3f2fd;
+      color: #0d47a1;
+      padding: 7px 10px;
+      border: 1px solid #90caf9;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .rule-table td {
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+    }
+    .rule-table tbody tr:nth-child(even) td { background: #f8fbff; }
+    .pt { color: #2e7d32; font-weight: bold; }
+    .pm { color: #c62828; font-weight: bold; }
+
+    /* ─── 提示框 ─── */
+    .info-box {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 6px;
+      padding: 9px 14px;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+    .info-box strong { color: #e65100; }
+
+    /* ─── 补充规则栏 ─── */
+    .extra-section { margin-top: 24px; }
+    .extra-section .section-title { color: #6a1b9a; border-color: #6a1b9a; }
+    .extra-hint {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+    .extra-rows { display: flex; flex-direction: column; gap: 0; }
+    .extra-row {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid #ce93d8;
+      border-top: none;
+      font-size: 13px;
+    }
+    .extra-rows .extra-row:first-child { border-top: 1px solid #ce93d8; border-radius: 6px 6px 0 0; }
+    .extra-rows .extra-row:last-child  { border-radius: 0 0 6px 6px; }
+    .extra-row .col-n {
+      width: 28px;
+      background: #f3e5f5;
+      color: #7b1fa2;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-right: 1px solid #ce93d8;
+    }
+    .extra-row input[type="text"] {
+      flex: 1;
+      border: none;
+      padding: 7px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      background: transparent;
+    }
+    .extra-row input[type="text"]:focus { background: #fce4ec; }
+    .extra-row .col-pts {
+      width: 90px;
+      border-left: 1px solid #ce93d8;
+      flex-shrink: 0;
+    }
+    .extra-row .col-pts input { width: 100%; text-align: center; }
+    .extra-ctrl {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-add-row {
+      padding: 5px 14px;
+      background: #7b1fa2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .btn-add-row:hover { background: #6a1b9a; }
+    .btn-del-row {
+      padding: 5px 12px;
+      background: #ef9a9a;
+      color: #b71c1c;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .btn-del-row:hover { background: #e57373; color: #fff; }
+
+    /* ─── 工具栏 ─── */
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .btn-tool {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 5px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn-ledger { background: #6a1b9a; color: #fff; }
+    .btn-ledger:hover { background: #4a148c; }
+    .btn-print  { background: #1565c0; color: #fff; }
+    .btn-print:hover { background: #0d47a1; }
+
+    /* ─── 打印样式 ─── */
+    @media print {
+      body { background: #fff; }
+      .container {
+        margin: 0; padding: 8mm 10mm; max-width: 100%;
+        box-shadow: none;
+      }
+      .no-print { display: none !important; }
+      .rule-table th {
+        background: #cce5ff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .extra-row input[type="text"] {
+        border-bottom: 1px solid #bbb;
+        background: transparent !important;
+      }
+      .extra-row { border-color: #bbb; }
+      .extra-row .col-n {
+        background: #f3e5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .extra-ctrl { display: none; }
+      @page { size: A4; margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ══ 标题 ══ -->
+  <div class="doc-title">🏆 家庭积分管理制度</div>
+  <div class="doc-subtitle">生效日期：2026年6月6日</div>
+  <hr class="doc-divider" />
+
+  <!-- ══ 一、得分细则 ══ -->
+  <div class="section-title">一、得分细则</div>
+  <table class="rule-table">
+    <thead>
+      <tr>
+        <th style="width:120px;">项目</th>
+        <th>条件</th>
+        <th style="width:80px;">得分</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>英语一起学 APP</strong></td>
+        <td>评级 A+</td>
+        <td class="pt">+5 分</td>
+      </tr>
+      <tr>
+        <td rowspan="4"><strong>数学</strong></td>
+        <td>试卷满分</td>
+        <td class="pt">+5 分</td>
+      </tr>
+      <tr>
+        <td>试卷 90 分以上 / 80~89 分</td>
+        <td class="pt">+1 分</td>
+      </tr>
+      <tr>
+        <td>试卷 80 分以下</td>
+        <td>0 分</td>
+      </tr>
+      <tr>
+        <td>完成 1 套口算试卷</td>
+        <td class="pt">+0.5 分</td>
+      </tr>
+      <tr>
+        <td rowspan="5"><strong>语文</strong></td>
+        <td>试卷满分</td>
+        <td class="pt">+15 分</td>
+      </tr>
+      <tr>
+        <td>试卷 90 分以上</td>
+        <td class="pt">+3 分</td>
+      </tr>
+      <tr>
+        <td>试卷 80~89 分</td>
+        <td class="pt">+1 分</td>
+      </tr>
+      <tr>
+        <td>试卷 80 分以下</td>
+        <td>0 分</td>
+      </tr>
+      <tr>
+        <td>完成 1 套语文打印练习</td>
+        <td class="pt">+0.5 分</td>
+      </tr>
+      <tr>
+        <td rowspan="4"><strong>英语试卷</strong></td>
+        <td>满分</td>
+        <td class="pt">+1 分</td>
+      </tr>
+      <tr>
+        <td>90 分以上</td>
+        <td class="pt">+0.5 分</td>
+      </tr>
+      <tr>
+        <td>80~89 分</td>
+        <td class="pt">+1 分</td>
+      </tr>
+      <tr>
+        <td>80 分以下</td>
+        <td>0 分</td>
+      </tr>
+      <tr>
+        <td><strong>重大奖励</strong></td>
+        <td>月考 / 期中 / 期末 / 各类竞赛：第一名、A+、获评学霸</td>
+        <td class="pt">+5 分/次</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══ 二、兑换规则 ══ -->
+  <div class="section-title">二、积分兑换规则</div>
+  <div class="info-box">
+    积攒满 <strong>60 分</strong> 即可兑换平板 / 游戏时间，<strong>1 积分 = 2 分钟</strong>。<br/>
+    例：当前积分 60 分 → 可兑换 <strong>120 分钟</strong>游戏时间。
+  </div>
+
+  <!-- ══ 三、扣分规则 ══ -->
+  <div class="section-title">三、扣分规则</div>
+  <div class="info-box">
+    学校下发试卷成绩 <strong>B 及以下</strong>，单次扣 <strong>0.5 分</strong>。
+  </div>
+
+  <!-- ══ 四、补充规则（临时增补）══ -->
+  <div class="extra-section">
+    <div class="section-title">四、补充规则（临时增补）</div>
+    <p class="extra-hint no-print">点击文字可直接编辑；打印时作为规则附录输出。</p>
+
+    <div class="extra-rows" id="extraRows">
+      <div class="extra-row"><div class="col-n">1</div><input type="text" placeholder="补充规则说明…" /><div class="col-pts"><input type="text" placeholder="分值" /></div></div>
+      <div class="extra-row"><div class="col-n">2</div><input type="text" placeholder="补充规则说明…" /><div class="col-pts"><input type="text" placeholder="分值" /></div></div>
+      <div class="extra-row"><div class="col-n">3</div><input type="text" placeholder="补充规则说明…" /><div class="col-pts"><input type="text" placeholder="分值" /></div></div>
+      <div class="extra-row"><div class="col-n">4</div><input type="text" placeholder="补充规则说明…" /><div class="col-pts"><input type="text" placeholder="分值" /></div></div>
+      <div class="extra-row"><div class="col-n">5</div><input type="text" placeholder="补充规则说明…" /><div class="col-pts"><input type="text" placeholder="分值" /></div></div>
+    </div>
+
+    <div class="extra-ctrl no-print">
+      <button class="btn-add-row" onclick="addExtraRow()">＋ 增加一行</button>
+      <button class="btn-del-row" onclick="delExtraRow()">－ 删除末行</button>
+    </div>
+  </div>
+
+  <!-- ══ 工具栏（屏幕专用）══ -->
+  <div class="toolbar no-print">
+    <a class="btn-tool btn-ledger" href="积分登记表（手工）.html" target="_blank">📋 手工打印登记表</a>
+    <button class="btn-tool btn-print" onclick="window.print()">🖨️ 打印 / 导出PDF</button>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  function addExtraRow() {
+    const rows  = document.getElementById('extraRows');
+    const count = rows.querySelectorAll('.extra-row').length + 1;
+    const row   = document.createElement('div');
+    row.className = 'extra-row';
+    row.innerHTML = `<div class="col-n">${count}</div><input type="text" placeholder="补充规则说明…" /><div class="col-pts"><input type="text" placeholder="分值" /></div>`;
+    rows.appendChild(row);
+  }
+
+  function delExtraRow() {
+    const rows = document.getElementById('extraRows');
+    const all  = rows.querySelectorAll('.extra-row');
+    if (all.length > 1) rows.removeChild(all[all.length - 1]);
+  }
+</script>
+</body>
+</html>
