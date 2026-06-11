@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>课后词语专项训练 · 一年级下册</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "宋体", "SimSun", serif; background: #f0f0f0; }
+
+  /* ===== 控制栏 ===== */
+  #controls {
+    position: sticky; top: 0; z-index: 10;
+    background: #1565c0; color: #fff;
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  }
+  #controls h1 { font-size: 16px; margin-right: 4px; }
+  #controls select, #controls button {
+    padding: 5px 10px; font-size: 14px; border: none; border-radius: 4px;
+    cursor: pointer; font-family: inherit;
+  }
+  #controls select { background: #fff; color: #1a237e; min-width: 130px; }
+  #controls button { font-weight: bold; }
+  #btn-generate { background: #ffeb3b; color: #1a237e; }
+  #btn-answer   { background: #e8f5e9; color: #2e7d32; }
+  #btn-print    { background: #f57c00; color: #fff; }
+  #btn-home {
+    background: rgba(255,255,255,.18); color: #fff;
+    border: 1px solid rgba(255,255,255,.45); font-weight: normal;
+    padding: 5px 10px; text-decoration: none; border-radius: 4px;
+    font-size: 13px; display: inline-flex; align-items: center;
+  }
+  #btn-home:hover { background: rgba(255,255,255,.32); }
+  .ctrl-group { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+  .sep { width: 1px; height: 24px; background: rgba(255,255,255,.4); }
+  .badge {
+    background: #ffeb3b; color: #1a237e;
+    border-radius: 10px; padding: 1px 8px; font-size: 12px;
+    margin-left: 4px;
+  }
+
+  /* ===== 课次面板 ===== */
+  #lesson-panel {
+    background: #fff;
+    border-bottom: 2px solid #1565c0;
+    padding: 10px 16px;
+    display: none;
+  }
+  #lesson-panel.show { display: block; }
+  .lp-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    font-size: 14px; flex-wrap: wrap;
+  }
+  .lp-header strong { color: #1a237e; }
+  .lp-header button {
+    padding: 3px 10px; font-size: 12px; border: 1px solid #1565c0;
+    background: #fff; color: #1565c0; border-radius: 3px; cursor: pointer;
+  }
+  .lp-header button:hover { background: #1565c0; color: #fff; }
+  .lp-header .hint { color: #999; font-size: 12px; }
+  .lp-groups {
+    display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px;
+  }
+  .lp-group {
+    flex: 0 0 auto; min-width: 180px;
+    border-left: 3px solid #1565c0; padding-left: 8px;
+  }
+  .lp-group h4 {
+    font-size: 13px; color: #1a237e; margin-bottom: 4px;
+  }
+  .lp-lesson {
+    display: flex; align-items: center; gap: 4px;
+    padding: 1px 0; cursor: pointer;
+  }
+  .lp-lesson input { accent-color: #1565c0; }
+  .lp-lesson label { cursor: pointer; }
+
+  /* ===== A4 页面 ===== */
+  #page-wrapper {
+    display: flex; justify-content: center;
+    padding: 24px 0 40px;
+  }
+  #a4-page {
+    width: 210mm; min-height: 297mm; background: #fff;
+    padding: 12mm; box-shadow: 0 3px 18px rgba(0,0,0,.25);
+    display: flex; flex-direction: column;
+  }
+  .page-title {
+    text-align: center; font-size: 20px; font-weight: bold;
+    letter-spacing: 2px; padding-bottom: 6px;
+    border-bottom: 1px solid #999;
+  }
+  .page-subtitle {
+    text-align: center; font-size: 12px; color: #666;
+    padding: 4px 0 6px; border-bottom: 1px dashed #ddd;
+  }
+  .info-bar {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    padding: 7px 4px; font-size: 13px;
+    margin-bottom: 6px; color: #555;
+    flex-wrap: wrap; gap: 6px;
+  }
+  .info-fill {
+    display: inline-block; width: 80px;
+    border-bottom: 1px solid #999; margin: 0 4px; height: 18px;
+    vertical-align: bottom;
+  }
+
+  /* ===== 通用 ===== */
+  .section { margin-top: 8px; flex: 1; }
+  .section-title {
+    font-weight: bold; font-size: 14px;
+    padding: 2px 0 4px; margin-bottom: 8px;
+    color: #000;
+  }
+  .tip { font-size: 11px; color: #888; font-weight: normal; margin-left: 6px; }
+  .empty-tip {
+    text-align: center; color: #999; padding: 60px 0; font-size: 14px;
+  }
+
+  /* ===== 题型 A：看拼音写词语（按题数自适应） ===== */
+  .grid-4col { display: grid; }
+  .row-A { display: flex; align-items: center; }
+  .row-A .num { color: #999; }
+  .row-A .py {
+    font-family: "Times New Roman", serif; letter-spacing: 0.5px;
+  }
+  .row-A .ans {
+    flex: 1; border-bottom: 1px solid #999;
+  }
+  /* 5/10 题：2 列大字号（充裕书写空间） */
+  .tier-A-5  { grid-template-columns: 1fr 1fr; gap: 18px 32px; }
+  .tier-A-5  .row-A { gap: 8px; }
+  .tier-A-5  .row-A .num { font-size: 14px; min-width: 30px; }
+  .tier-A-5  .row-A .py { min-width: 130px; font-size: 22px; }
+  .tier-A-5  .row-A .ans { height: 50px; }
+  .tier-A-10 { grid-template-columns: 1fr 1fr; gap: 12px 26px; }
+  .tier-A-10 .row-A { gap: 6px; }
+  .tier-A-10 .row-A .num { font-size: 12px; min-width: 26px; }
+  .tier-A-10 .row-A .py { min-width: 105px; font-size: 17px; }
+  .tier-A-10 .row-A .ans { height: 38px; }
+  /* 15-20 题：3 列中字号（4 列下答题区过窄） */
+  .tier-A-15 { grid-template-columns: 1fr 1fr 1fr; gap: 10px 18px; }
+  .tier-A-15 .row-A { gap: 6px; }
+  .tier-A-15 .row-A .num { font-size: 12px; min-width: 24px; }
+  .tier-A-15 .row-A .py { min-width: 95px; font-size: 16px; }
+  .tier-A-15 .row-A .ans { height: 30px; }
+  .tier-A-20 { grid-template-columns: 1fr 1fr 1fr; gap: 8px 14px; }
+  .tier-A-20 .row-A { gap: 5px; }
+  .tier-A-20 .row-A .num { font-size: 11px; min-width: 20px; }
+  .tier-A-20 .row-A .py { min-width: 82px; font-size: 14px; }
+  .tier-A-20 .row-A .ans { height: 26px; }
+  /* 30+ 题：4 列紧凑 */
+  .tier-A-30 { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px 8px; }
+  .tier-A-30 .row-A { gap: 3px; }
+  .tier-A-30 .row-A .num { font-size: 9px; min-width: 16px; }
+  .tier-A-30 .row-A .py { min-width: 58px; font-size: 11.5px; }
+  .tier-A-30 .row-A .ans { height: 21px; }
+  .tier-A-40 { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px 6px; }
+  .tier-A-40 .row-A { gap: 3px; }
+  .tier-A-40 .row-A .num { font-size: 9px; min-width: 15px; }
+  .tier-A-40 .row-A .py { min-width: 50px; font-size: 10.5px; }
+  .tier-A-40 .row-A .ans { height: 19px; }
+  .tier-A-50 { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 3px 5px; }
+  .tier-A-50 .row-A { gap: 2px; }
+  .tier-A-50 .row-A .num { font-size: 8px; min-width: 14px; }
+  .tier-A-50 .row-A .py { min-width: 44px; font-size: 10px; }
+  .tier-A-50 .row-A .ans { height: 17px; }
+  .tier-A-60 { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 2px 4px; }
+  .tier-A-60 .row-A { gap: 2px; }
+  .tier-A-60 .row-A .num { font-size: 8px; min-width: 14px; }
+  .tier-A-60 .row-A .py { min-width: 40px; font-size: 9.5px; }
+  .tier-A-60 .row-A .ans { height: 15px; }
+
+  /* ===== 题型 B：看词语写拼音 ===== */
+  .grid-2col-wide { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+  .row-B { display: flex; align-items: flex-start; gap: 6px; }
+  .row-B .num { color: #999; min-width: 24px; font-size: 12px; padding-top: 8px; }
+  .row-B .word {
+    font-family: "楷体", "KaiTi", serif;
+    font-size: 18px; min-width: 60px; padding-top: 4px;
+  }
+  .row-B .py-box {
+    flex: 1;
+    background:
+      linear-gradient(#bbb, #bbb) 0 0/100% 0.5px no-repeat,
+      linear-gradient(#bbb, #bbb) 0 12px/100% 0.5px no-repeat,
+      linear-gradient(#bbb, #bbb) 0 24px/100% 0.5px no-repeat,
+      linear-gradient(#bbb, #bbb) 0 36px/100% 0.5px no-repeat;
+    border-bottom: 0.5px solid #999;
+    height: 42px;
+    position: relative;
+  }
+
+  /* ===== 题型 C：词语连线 ===== */
+  .grid-c {
+    display: grid; grid-template-columns: 1fr 80px 1fr;
+    gap: 10px 0; align-items: center;
+  }
+  .row-C.left  { justify-self: end;   display: flex; align-items: center; gap: 6px; }
+  .row-C.right { justify-self: start; display: flex; align-items: center; gap: 6px; }
+  .row-C .num { color: #999; font-size: 11px; min-width: 18px; }
+  .row-C .py {
+    font-family: "Times New Roman", serif; font-size: 14px;
+    padding: 4px 10px; border: 1px solid #90caf9; border-radius: 3px;
+    background: #f5f9ff;
+  }
+  .row-C .word {
+    font-family: "楷体", "KaiTi", serif; font-size: 16px;
+    padding: 4px 10px; border: 1px solid #ccc; border-radius: 3px;
+    background: #fff; letter-spacing: 2px;
+  }
+  .dash-cell {
+    border-bottom: 1px dashed #999; height: 0; width: 60px;
+    margin: 0 auto;
+  }
+
+  /* ===== 题型 D：词语选择 ===== */
+  .grid-D { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+  .row-D { font-size: 13px; padding: 4px 0; }
+  .row-D .num { color: #999; font-size: 11px; margin-right: 4px; }
+  .row-D .word {
+    font-family: "楷体", "KaiTi", serif; font-size: 18px;
+    display: inline-block; min-width: 60px;
+  }
+  .row-D .opts {
+    display: inline-flex; gap: 12px; flex-wrap: wrap;
+    margin-left: 8px; font-family: "Times New Roman", serif;
+    font-size: 13px;
+  }
+  .row-D .opt { display: inline-flex; align-items: center; gap: 3px; }
+  .row-D .opt-letter { color: #999; font-size: 11px; min-width: 14px; }
+
+  /* ===== 答案区 ===== */
+  #answer-section {
+    max-width: 760px; margin: 0 auto 24px;
+    background: #fffde7; border: 1px solid #f9a825;
+    border-radius: 5px; padding: 10px 16px; font-size: 12px;
+    display: none;
+  }
+  #answer-section.show { display: block; }
+  #answer-section h3 { color: #f57c00; margin-bottom: 6px; font-size: 13px; }
+  .ans-row {
+    display: flex; gap: 8px; align-items: baseline;
+    padding: 2px 0;
+  }
+  .ans-row .num { color: #999; min-width: 24px; }
+  .ans-row .py { font-family: "Times New Roman", serif; color: #c62828; }
+  .ans-row .word { font-family: "楷体", "KaiTi", serif; font-size: 15px; }
+  .ans-row .arrow { color: #888; }
+  .ans-row .ans-tag { color: #c62828; font-weight: bold; }
+
+  /* ===== 页脚 ===== */
+  .footer {
+    text-align: center; font-size: 10px; color: #aaa;
+    padding-top: 8px; margin-top: auto;
+    border-top: 1px dashed #ddd;
+  }
+
+  /* ===== 打印 ===== */
+  @media print {
+    @page { size: A4 portrait; margin: 0; }
+    body { background: none; }
+    #controls, #lesson-panel, #answer-section, #wx-print-mask { display: none !important; }
+    #page-wrapper { padding: 0; }
+    #a4-page {
+      width: 100%; min-height: auto; box-shadow: none; padding: 10mm 12mm;
+      page-break-inside: avoid; break-inside: avoid;
+    }
+    .page-title { color: #000; font-size: 18px; padding-bottom: 4px; }
+    .page-subtitle { color: #333; border-bottom-color: #888; padding: 2px 0 4px; font-size: 11px; }
+    .info-bar { padding: 4px 4px 4px; margin-bottom: 4px; font-size: 12px; }
+    .section-title { padding: 2px 0 4px; margin-bottom: 6px; font-size: 13px; }
+    .section { page-break-inside: avoid; break-inside: avoid; }
+    .info-fill { border-bottom-color: #000; }
+    .row-A .py, .row-B .word, .row-C .py, .row-C .word, .row-D .word { color: #000; }
+    .row-C .py { background: none; border-color: #000; }
+    .row-C .word { background: none; border-color: #000; }
+    .footer { color: #444; border-top-color: #888; padding-top: 6px; font-size: 9px; }
+  }
+  /* ===== 手机端 ===== */
+  @media screen and (max-width: 820px) {
+    #controls { position: relative; }
+    #page-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 8px 0 24px; justify-content: flex-start; }
+    #a4-page { margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 控制栏 ===== -->
+<div id="controls">
+  <a id="btn-home" href="../index.html">← 首页</a>
+  <div class="sep"></div>
+  <h1>课后词语专项训练</h1>
+  <div class="sep"></div>
+  <button id="btn-lessons">📚 选课文 <span id="selected-count" class="badge">0</span></button>
+  <div class="sep"></div>
+  <div class="ctrl-group">
+    <span>每页题数：</span>
+    <select id="sel-count">
+      <option value="5">5 题</option>
+      <option value="10">10 题</option>
+      <option value="15">15 题</option>
+      <option value="20" selected>20 题</option>
+      <option value="30">30 题</option>
+      <option value="40">40 题</option>
+      <option value="50">50 题</option>
+      <option value="60">60 题</option>
+    </select>
+  </div>
+  <div class="sep"></div>
+  <div class="ctrl-group">
+    <span>题型：</span>
+    <select id="sel-type">
+      <option value="A" selected>A. 看拼音写词语</option>
+      <option value="B">B. 看词语写拼音</option>
+      <option value="C">C. 词语连线</option>
+      <option value="D">D. 词语选择</option>
+    </select>
+  </div>
+  <div class="sep"></div>
+  <button id="btn-generate">⟳ 重新生成</button>
+  <button id="btn-answer">👁 答案</button>
+  <button id="btn-print">🖨 打印</button>
+</div>
+
+<!-- ===== 课次面板 ===== -->
+<div id="lesson-panel">
+  <div class="lp-header">
+    <strong>选择课文范围（可多选）</strong>
+    <button id="btn-select-all">全选</button>
+    <button id="btn-select-none">全不选</button>
+    <span class="hint">· 「词语」组别仅在「D. 词语选择」题型下生效</span>
+  </div>
+  <div class="lp-groups" id="lp-groups"></div>
+</div>
+
+<!-- ===== A4 页面 ===== -->
+<div id="page-wrapper">
+  <div id="a4-page">
+    <div class="page-title">课后词语专项训练</div>
+    <div class="page-subtitle" id="subtitle">—</div>
+    <div class="info-bar">
+      <span>姓名：<span class="info-fill"></span></span>
+      <span>日期：<span class="info-fill" style="width:90px;"></span></span>
+      <span>用时：<span class="info-fill" style="width:50px;"></span> 分钟</span>
+      <span>得分：<span class="info-fill" style="width:50px;"></span></span>
+    </div>
+    <div class="section" id="content"></div>
+    <div class="footer">教材：人教统编版 一年级下册 · 课后词语专项训练 · 数据源：课后生词拼音练习.txt</div>
+  </div>
+</div>
+
+<!-- ===== 答案区 ===== -->
+<div id="answer-section">
+  <h3>参考答案（打印时自动隐藏）</h3>
+  <div id="ans-content"></div>
+</div>
+
+<!-- ===== 微信打印引导 ===== -->
+<div id="wx-print-mask" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.65);padding:20px;box-sizing:border-box;">
+  <div style="background:#fff;border-radius:12px;padding:24px 20px;max-width:320px;margin:50px auto 0;font-family:'微软雅黑',sans-serif;text-align:center;">
+    <div style="font-size:40px;margin-bottom:10px">📱</div>
+    <div style="font-size:16px;font-weight:bold;color:#1a237e;margin-bottom:12px">微信内无法直接打印</div>
+    <div style="font-size:14px;color:#333;line-height:2.1;text-align:left;background:#f5f5f5;border-radius:8px;padding:12px 14px">
+      ① 点击右上角 <strong>···</strong> 菜单<br>
+      ② 选择 <strong>在浏览器打开</strong><br>
+      ③ 在 Safari / Chrome 中<br>
+      &nbsp;&nbsp;&nbsp;再点击"打印"按钮
+    </div>
+    <div style="margin-top:14px;font-size:12px;color:#aaa">点击任意处关闭</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ===================================================================
+  // ⚠️ 原始数据（与 语文/课后生词拼音练习.txt 保持同步）
+  // 同步说明：修改 .txt 后，把内容复制到下方 RAW 常量
+  // 启动时自动校验 40 课（32 写字表课 + 4 词语课 + 4 词语课）
+  // 写字表 200 字 + 词语汇总 42 词
+  // ===================================================================
+  const RAW = `# 一年级下册写字表 200 字 · 看拼音选词语练习
+# 格式：拼音 + 含该字的常用词语（每课一行，6/4/7 个一组）
+# 数据源：人教统编版 一年级下册「写字表」
+# 修订：2026-06-11
+
+
+识字一（春夏秋冬）
+
+chūn 春雨　dōng 冬天　chuī 吹风　huā 花园　fēi 飞鸟　rù 入口
+
+
+识字二（姓氏歌）
+
+shén 什么　me 多么　gǔ 古人　hú 胡子　shuāng 双手　yán 语言
+
+
+识字三（小青蛙）
+
+qīng 青草　qīng 清水　qíng 晴天　miáo 禾苗　qǐng 请问　shēng 学生
+
+
+识字四（猜字谜）
+
+zì 生字　hóng 红花　dòng 运动　wàn 万里　wú 无人　míng 明天
+
+
+园地一
+
+wén 语文　kǎ 卡片　piàn 相片　hé 合唱
+
+
+课文一（热爱中国共产党）
+
+gòng 共同　chǎn 生产　dǎng 党员　tài 太阳　yáng 阳光　guāng 光明
+
+
+课文二（吃水不忘挖井人）
+
+jǐng 水井　zhǔ 主人　jiāng 长江　zhù 住家　fāng 方法　hòu 后来
+
+
+课文三（我多想去看看）
+
+gào 告诉　de 我的　huì 开会　běi 北方　jīng 北京　guǎng 广场
+
+
+园地二
+
+xiě 写字　rèn 认识
+
+
+课文四（小公鸡和小鸭子）
+
+zǒu 走路　hé 小河　shuō 说话　ràng 让开　zì 自己　jǐ 自己
+
+
+课文五（树和喜鹊）
+
+cóng 从前　hǎo 好人　men 我们　jiào 叫声　tā 他们　huí 回家
+
+
+课文六（怎么都快乐）
+
+kuài 快乐　lè 快乐　dāng 当心　shū 读书　huà 图画　máo 毛笔
+
+
+课文七（静夜思）
+
+sī 思念　chuáng 床头　qián 前面　dì 土地　gù 故乡　xiāng 家乡
+
+
+课文八（夜色）
+
+sè 颜色　bǎ 把手　jiǎng 讲话　yàng 一样　xiào 微笑　zài 再见
+
+
+课文九（端午粽）
+
+jié 节日　mǐ 大米　jiān 中间　fēn 分开　chī 吃饭　ròu 牛肉
+
+
+园地三
+
+zhǐ 停止　jīn 公斤　cùn 尺寸　dīng 丁香　qiān 千万　dàn 元旦
+
+
+园地四
+
+cè 画册　zhī 一支　diàn 电灯　yī 衣服
+
+
+识字五（动物儿歌）
+
+wù 动物　zào 造句　yùn 运动　huān 喜欢　fáng 房子　wǎng 上网
+
+
+识字六（古对今）
+
+duì 对错　jīn 今天　xuě 白雪　xì 细心　xī 夕阳　yǔ 语言
+
+
+识字七（操场上）
+
+dǎ 打球　pí 皮球　pǎo 跑步　zú 足球　shā 沙包　bāo 书包
+
+
+识字八（人之初）
+
+jìn 远近　xí 学习　yuǎn 远方　xué 学校　yù 玉米　yì 正义
+
+
+园地五
+
+bǎo 吃饱　bào 拥抱
+
+
+课文十（古诗二首）
+
+shǒu 一首　chí 水池　cǎi 采花　jiān 尖角　jiǎo 牛角　zǎo 早上
+
+
+课文十一（浪花）
+
+yǎn 眼睛　lèi 眼泪　tā 它们　bèi 贝壳　qì 空气　wá 娃娃
+
+
+课文十二（荷叶圆圆）
+
+jī 飞机　tái 讲台　chàng 唱歌　sǎn 雨伞　duǒ 花朵　měi 美丽
+
+
+课文十三（要下雨了）
+
+zhè 这里　kàn 看见　yú 金鱼　miàn 前面　wèn 问题　jiā 加油
+
+
+园地六
+
+dòu 红豆　dǒu 星斗
+
+
+课文十四（文具的家）
+
+bǐ 毛笔　zhī 知道　dào 道路　fàng 放学　píng 平安　ān 安全
+
+
+课文十五（一分钟）
+
+yuán 元旦　dēng 电灯　chē 汽车　zhàn 车站　zuò 坐下　lǎo 老人　shī 老师
+
+
+课文十六（动物王国开大会）
+
+guó 中国　dōu 都是　bǎi 一百　tīng 听话　shí 时间　diǎn 一点　lín 树林
+
+
+课文十七（小猴子下山）
+
+gāo 高兴　xìng 高兴　zhe 看着　wǎng 往来　guā 西瓜　tù 兔子　jìn 前进
+
+
+园地七
+
+jīn 毛巾　xǐ 洗手
+
+
+课文十八（棉花姑娘）
+
+tā 她们　kōng 天空　hái 还有　gān 干净　shēn 身体　xīng 星星　jiǔ 长久
+
+
+课文十九（咕咚）
+
+xià 吓人　wèi 因为　pà 害怕　jiā 回家　xiàng 大象　méi 没有　dào 到达
+
+
+课文二十（小壁虎借尾巴）
+
+xiàng 方向　biān 身边　xíng 行走　cǎo 小草　gǎn 赶快　guò 走过　zhǎo 寻找
+
+
+园地八
+
+yè 一页　hù 户口　jiāo 交友　fù 父亲
+
+
+# ====== 双字词语汇总（可选补充练习） ======
+# 下方为含写字表字的常用 2 字词，标注完整拼音
+# 来源：从课后生词中精选，组词方向为「包含该课写字」
+
+词语一
+
+běi jīng 北京　fēi rù 飞入　shēng chǎn 生产　xiě zì 写字　tài yáng 太阳
+hòu lái 后来　guǎng gào 广告　chūn yǔ 春雨　chuī fēng 吹风　yǔ yán 语言
+kǎ piàn 卡片　shén me 什么
+
+
+词语二
+
+qíng tiān 晴天　qǐng wèn 请问　hú zi 胡子　dōng rì 冬日　qīng shuǐ 清水
+huǒ hóng 火红　wú rén 无人　wàn lǐ 万里　shuāng fāng 双方　gōng gòng 公共
+jǐng kǒu 井口　dǎng yuán 党员
+
+
+词语三
+
+zhǔ rén 主人　zhù kǒu 住口　cháng jiāng 长江　guǎng dà 广大　guāng míng 光明
+rèn shì 认识　kāi huā 开花　hé chàng 合唱　dòng shǒu 动手
+
+
+词语四
+
+shì de 是的　kāi huì 开会　qīng shān 青山　běi fāng 北方　rèn kě 认可
+xiān hòu 先后　hé miáo 禾苗　yáng guāng 阳光　wén míng 文明
+`;
+
+  // ===================================================================
+  // 解析 RAW → LESSONS
+  // ===================================================================
+  function parseRaw(raw) {
+    const lessons = [];
+    let current = null;
+    // 课次标题：识字X/课文X/园地X/词语X（X 为中文数字），可有可无「（...）」
+    const titleRe = /^(识字|课文|园地|词语)([一二三四五六七八九十]+)(?:[（(][^)）]*[)）])?\s*$/;
+    // 词语单元：同上，「（含写字表字）」等注释不算标题
+    const itemRe = /^([a-zA-ZāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüĀ-ɏ\s]+?)\s+([一-鿿]+)$/;
+
+    for (const rawLine of raw.split('\n')) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+
+      const m = line.match(titleRe);
+      if (m) {
+        if (current) lessons.push(current);
+        const prefix = m[1];
+        const num = m[2];
+        current = {
+          id: prefix + num,
+          group: prefix,           // 识字/课文/园地/词语
+          name: prefix + num,      // 显示名（不带括号内容，保持简洁）
+          items: []
+        };
+        continue;
+      }
+
+      if (!current) continue;
+
+      // 用全角空格（U+3000）切分，保留 pinyin+word 内部的普通空格
+      const parts = line.split(/　+/).filter(Boolean);
+      for (const part of parts) {
+        const im = part.match(itemRe);
+        if (im) {
+          current.items.push({ py: im[1].trim(), word: im[2] });
+        }
+      }
+    }
+    if (current) lessons.push(current);
+    return lessons;
+  }
+
+  const LESSONS = parseRaw(RAW);
+
+  // 启动校验
+  const totalItems = LESSONS.reduce((s, l) => s + l.items.length, 0);
+  const xieziLessons = LESSONS.filter(l => l.group !== '词语');
+  const xieziItems = xieziLessons.reduce((s, l) => s + l.items.length, 0);
+  if (LESSONS.length !== 40) {
+    console.warn(`[课后词语] 解析异常：应 40 课，实得 ${LESSONS.length} 课`);
+  }
+  if (xieziItems !== 200) {
+    console.warn(`[课后词语] 解析异常：写字表应 200 字，实得 ${xieziItems} 字`);
+  }
+
+  // ===================================================================
+  // 构建「字 → 拼音」映射（用于拼接「组词完整拼音」）
+  // 1) XIEZI_PY：200 写字表 字 → 拼音（数据源：1.txt 识字表 + 本练习数据）
+  // 2) FALLBACK_PY：组词里上下文字（不在 200 字内）的常用字字典
+  // 3) 词语：item.py 已是完整词拼音（空格分字），再拆字补充
+  // ===================================================================
+  const XIEZI_PY = {
+    春:'chūn',冬:'dōng',吹:'chuī',花:'huā',飞:'fēi',入:'rù',
+    什:'shén',么:'me',古:'gǔ',胡:'hú',双:'shuāng',言:'yán',
+    青:'qīng',清:'qīng',晴:'qíng',苗:'miáo',请:'qǐng',生:'shēng',
+    字:'zì',红:'hóng',动:'dòng',万:'wàn',无:'wú',明:'míng',
+    文:'wén',卡:'kǎ',片:'piàn',合:'hé',
+    共:'gòng',产:'chǎn',党:'dǎng',太:'tài',阳:'yáng',光:'guāng',
+    井:'jǐng',主:'zhǔ',江:'jiāng',住:'zhù',方:'fāng',后:'hòu',
+    告:'gào',的:'de',会:'huì',北:'běi',京:'jīng',广:'guǎng',
+    走:'zǒu',河:'hé',说:'shuō',让:'ràng',自:'zì',己:'jǐ',
+    从:'cóng',好:'hǎo',们:'men',叫:'jiào',他:'tā',回:'huí',
+    快:'kuài',乐:'lè',当:'dāng',书:'shū',画:'huà',毛:'máo',
+    思:'sī',床:'chuáng',前:'qián',地:'dì',故:'gù',乡:'xiāng',
+    色:'sè',把:'bǎ',讲:'jiǎng',样:'yàng',笑:'xiào',再:'zài',
+    节:'jié',米:'mǐ',间:'jiān',分:'fēn',吃:'chī',肉:'ròu',
+    止:'zhǐ',斤:'jīn',寸:'cùn',丁:'dīng',千:'qiān',旦:'dàn',
+    册:'cè',支:'zhī',电:'diàn',衣:'yī',
+    物:'wù',造:'zào',运:'yùn',欢:'huān',房:'fáng',网:'wǎng',
+    对:'duì',今:'jīn',雪:'xuě',细:'xì',夕:'xī',语:'yǔ',
+    打:'dǎ',皮:'pí',跑:'pǎo',足:'zú',沙:'shā',包:'bāo',
+    近:'jìn',习:'xí',远:'yuǎn',学:'xué',玉:'yù',义:'yì',
+    饱:'bǎo',抱:'bào',
+    首:'shǒu',池:'chí',采:'cǎi',尖:'jiān',角:'jiǎo',早:'zǎo',
+    眼:'yǎn',泪:'lèi',它:'tā',贝:'bèi',气:'qì',娃:'wá',
+    机:'jī',台:'tái',唱:'chàng',伞:'sǎn',朵:'duǒ',美:'měi',
+    这:'zhè',看:'kàn',鱼:'yú',面:'miàn',问:'wèn',加:'jiā',
+    笔:'bǐ',知:'zhī',道:'dào',放:'fàng',平:'píng',安:'ān',
+    元:'yuán',灯:'dēng',车:'chē',站:'zhàn',坐:'zuò',老:'lǎo',师:'shī',
+    国:'guó',都:'dōu',百:'bǎi',听:'tīng',时:'shí',点:'diǎn',林:'lín',
+    高:'gāo',兴:'xìng',着:'zhe',往:'wǎng',瓜:'guā',兔:'tù',进:'jìn',
+    她:'tā',空:'kōng',还:'hái',干:'gān',身:'shēn',星:'xīng',久:'jiǔ',
+    吓:'xià',为:'wèi',怕:'pà',家:'jiā',象:'xiàng',没:'méi',到:'dào',
+    向:'xiàng',边:'biān',行:'xíng',草:'cǎo',赶:'gǎn',过:'guò',找:'zhǎo',
+    页:'yè',户:'hù',交:'jiāo',父:'fù',
+    写:'xiě',认:'rèn',
+    豆:'dòu',斗:'dǒu',
+    巾:'jīn',洗:'xǐ'
+  };
+  // 上下文字字典（数据中出现但不在 200 写字表内的常用字）
+  const FALLBACK_PY = {
+    园:'yuán',鸟:'niǎo',草:'cǎo',同:'tóng',法:'fǎ',诉:'sù',
+    场:'chǎng',路:'lù',话:'huà',声:'shēng',心:'xīn',念:'niàn',
+    头:'tóu',见:'jiàn',饭:'fàn',香:'xiāng',服:'fú',句:'jù',
+    错:'cuò',球:'qiú',步:'bù',近:'jìn',校:'xiào',壳:'ké',
+    歌:'gē',丽:'lì',题:'tí',油:'yóu',全:'quán',下:'xià',
+    国:'guó',百:'bǎi',点:'diǎn',林:'lín',着:'zhe',瓜:'guā',
+    有:'yǒu',净:'jìng',体:'tǐ',久:'jiǔ',为:'wèi',怕:'pà',
+    达:'dá',边:'biān',过:'guò',友:'yǒu',亲:'qīn',多:'duō',
+    人:'rén',子:'zi',古:'gǔ',火:'huǒ',里:'lǐ',大:'dà',
+    天:'tiān',风:'fēng',水:'shuǐ',牛:'niú',苗:'miáo',问:'wèn',
+    雨:'yǔ',飞:'fēi',口:'kǒu',公:'gōng',手:'shǒu',足:'zú',
+    相:'xiāng',我:'wǒ',小:'xiǎo',读:'dú',图:'tú',土:'tǔ',
+    颜:'yán',一:'yī',微:'wēi',中:'zhōng',停:'tíng',尺:'chǐ',
+    喜:'xǐ',上:'shàng',白:'bái',正:'zhèng',拥:'yōng',睛:'jīng',
+    金:'jīn',汽:'qì',树:'shù',西:'xī',因:'yīn',害:'hài',寻:'xún'
+  };
+  const CHAR_PY = Object.assign({}, FALLBACK_PY, XIEZI_PY);
+  // 词语：item.py 是完整词拼音（空格分字），拆字补充（覆盖 词语 部分 42 词中所有字）
+  LESSONS.forEach(l => {
+    if (l.group !== '词语') return;
+    l.items.forEach(it => {
+      const pys = it.py.split(/\s+/).filter(Boolean);
+      if (pys.length === it.word.length) {
+        for (let i = 0; i < it.word.length; i++) {
+          if (!CHAR_PY[it.word[i]]) CHAR_PY[it.word[i]] = pys[i];
+        }
+      }
+    });
+  });
+
+  // 为每条 item 补上 pyFull（组词完整拼音）
+  let pyFullMiss = 0;
+  LESSONS.forEach(l => {
+    l.items.forEach(it => {
+      const chars = [...it.word];
+      if (it.py.includes(' ')) {
+        // 词语：py 已是完整词拼音
+        it.pyFull = it.py;
+      } else if (chars.length === 1) {
+        it.pyFull = it.py;
+      } else {
+        // 写字表组词：逐字拼
+        const parts = chars.map(c => {
+          const py = CHAR_PY[c];
+          if (!py) { pyFullMiss++; return '·'; }
+          return py;
+        });
+        it.pyFull = parts.join(' ');
+      }
+    });
+  });
+  if (pyFullMiss > 0) console.warn(`[课后词语] pyFull 缺失字 ${pyFullMiss} 处`);
+
+  // ===================================================================
+  // 工具函数
+  // ===================================================================
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // 题型最大题数（确保 1 页 A4）
+  const TYPE_MAX = { A: 60, B: 20, C: 8, D: 6 };
+
+  // 题型显示名
+  const TYPE_NAME = {
+    A: '看拼音写词语',
+    B: '看词语写拼音',
+    C: '词语连线',
+    D: '词语选择'
+  };
+
+  // 状态
+  let currentItems = [];     // 当前渲染的 items
+  let currentType = 'A';
+  let currentAnswer = null;  // 当前题型专属的答案状态（C 连线 / D 选词）
+
+  // ===================================================================
+  // 收集所选课的所有 items
+  // ===================================================================
+  function collectItems(lessons, selectedIds, type) {
+    const pool = [];
+    for (const id of selectedIds) {
+      const l = lessons.find(x => x.id === id);
+      if (!l) continue;
+      // Type D 仅取「词语」组
+      if (type === 'D' && l.group !== '词语') continue;
+      for (const it of l.items) {
+        pool.push({ ...it, lessonId: l.id, lessonName: l.name });
+      }
+    }
+    return pool;
+  }
+
+  // ===================================================================
+  // 题型渲染
+  // ===================================================================
+  function buildTypeA(items, count) {
+    const tierClass = 'tier-A-' + (count || items.length);
+    let html = '<div class="section-title">一、看拼音，写词语 <span class="tip">（在横线上写出对应的 2 字词语）</span></div>';
+    html += `<div class="grid-4col ${tierClass}">`;
+    items.forEach((it, i) => {
+      const pyDisp = it.pyFull || it.py;
+      html += `<div class="row-A">
+        <span class="num">${i + 1}.</span>
+        <span class="py">${pyDisp}</span>
+        <span class="ans" data-ans="${it.word}"></span>
+      </div>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function buildTypeB(items) {
+    let html = '<div class="section-title">二、看词语，写拼音 <span class="tip">（在四线格中按声调写拼音）</span></div>';
+    html += '<div class="grid-2col-wide">';
+    items.forEach((it, i) => {
+      html += `<div class="row-B">
+        <span class="num">${i + 1}.</span>
+        <span class="word">${it.word}</span>
+        <span class="py-box" data-ans="${it.py}"></span>
+      </div>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function buildTypeC(items) {
+    // Type C: 8 对，pinyin 左 / 词 右，打乱顺序
+    const shuffled = shuffle(items);
+    const leftPy = shuffled.map(it => it.py);
+    const rightWord = shuffle(shuffled).map(it => it.word);
+
+    // 计算答案：A→? B→? ...
+    const answerMap = shuffled.map((it, leftIdx) => {
+      const rightIdx = rightWord.indexOf(it.word);
+      return {
+        leftLetter: String.fromCharCode(65 + leftIdx),
+        rightNum: rightIdx + 1,
+        py: it.py,
+        word: it.word
+      };
+    });
+
+    let html = '<div class="section-title">三、词语连线 <span class="tip">（把左边的拼音与右边的词语用直尺连线）</span></div>';
+    html += '<div class="grid-c">';
+    for (let i = 0; i < leftPy.length; i++) {
+      html += `<div class="row-C left">
+        <span class="num">${String.fromCharCode(65 + i)}.</span>
+        <span class="py">${leftPy[i]}</span>
+      </div>`;
+      html += `<div class="dash-cell"></div>`;
+      html += `<div class="row-C right">
+        <span class="word">${rightWord[i]}</span>
+        <span class="num">${i + 1}.</span>
+      </div>`;
+    }
+    html += '</div>';
+
+    currentAnswer = answerMap;
+    return html;
+  }
+
+  function buildTypeD(items) {
+    // Type D: 每个词 4 个拼音选项（1 正确 + 3 干扰）
+    const allPy = items.map(it => it.py);
+    let html = '<div class="section-title">四、词语选择 <span class="tip">（从 4 个选项中选出与词语对应的拼音）</span></div>';
+    html += '<div class="grid-D">';
+    const answerKey = [];
+
+    items.forEach((it, i) => {
+      const distractors = shuffle(allPy.filter(p => p !== it.py)).slice(0, 3);
+      const options = shuffle([it.py, ...distractors]);
+      const correctIdx = options.indexOf(it.py);
+      answerKey.push({ word: it.word, py: it.py, letter: String.fromCharCode(65 + correctIdx) });
+
+      html += `<div class="row-D">
+        <span class="num">${i + 1}.</span>
+        <span class="word">${it.word}</span>
+        <span class="opts">`;
+      options.forEach((opt, j) => {
+        html += `<span class="opt"><span class="opt-letter">${String.fromCharCode(65 + j)}.</span>${opt}</span>`;
+      });
+      html += `</span></div>`;
+    });
+    html += '</div>';
+
+    currentAnswer = answerKey; // 复用保存答案
+    return html;
+  }
+
+  // ===================================================================
+  // 答案区
+  // ===================================================================
+  function buildAnswer(type, items) {
+    const ac = document.getElementById('ans-content');
+    let html = '';
+    if (type === 'A') {
+      items.forEach((it, i) => {
+        const pyDisp = it.pyFull || it.py;
+        html += `<div class="ans-row">
+          <span class="num">${i + 1}.</span>
+          <span class="py">${pyDisp}</span>
+          <span class="arrow">→</span>
+          <span class="word">${it.word}</span>
+        </div>`;
+      });
+    } else if (type === 'B') {
+      items.forEach((it, i) => {
+        html += `<div class="ans-row">
+          <span class="num">${i + 1}.</span>
+          <span class="word">${it.word}</span>
+          <span class="arrow">→</span>
+          <span class="py">${it.py}</span>
+        </div>`;
+      });
+    } else if (type === 'C') {
+      // A→3, B→1, C→5, ...
+      const sorted = currentAnswer.slice().sort((a, b) =>
+        a.leftLetter.localeCompare(b.leftLetter));
+      sorted.forEach(a => {
+        html += `<div class="ans-row">
+          <span class="num">${a.leftLetter}</span>
+          <span class="arrow">→</span>
+          <span class="ans-tag">${a.rightNum}</span>
+          <span class="py" style="margin-left:14px;">${a.py}</span>
+          <span class="word">${a.word}</span>
+        </div>`;
+      });
+    } else if (type === 'D') {
+      currentAnswer.forEach((a, i) => {
+        html += `<div class="ans-row">
+          <span class="num">${i + 1}.</span>
+          <span class="word">${a.word}</span>
+          <span class="arrow">→</span>
+          <span class="ans-tag">${a.letter}</span>
+          <span class="py" style="margin-left:10px;">${a.py}</span>
+        </div>`;
+      });
+    }
+    ac.innerHTML = html;
+  }
+
+  // ===================================================================
+  // 主渲染
+  // ===================================================================
+  function render() {
+    const type = document.getElementById('sel-type').value;
+    const wantedCount = parseInt(document.getElementById('sel-count').value, 10);
+    const maxForType = TYPE_MAX[type];
+    const count = Math.min(wantedCount, maxForType);
+
+    currentType = type;
+    currentAnswer = null;
+
+    // 收集 items
+    const selectedIds = Array.from(document.querySelectorAll('.lp-lesson input:checked'))
+      .map(el => el.dataset.id);
+    if (selectedIds.length === 0) {
+      document.getElementById('content').innerHTML =
+        '<div class="empty-tip">请先点击上方「选课文」按钮勾选要练习的课文范围</div>';
+      document.getElementById('subtitle').textContent = '—';
+      document.getElementById('answer-section').classList.remove('show');
+      return;
+    }
+
+    const pool = collectItems(LESSONS, selectedIds, type);
+    if (pool.length === 0) {
+      const msg = type === 'D'
+        ? '当前选中的课中没有「词语」组，请勾选「词语一/二/三/四」'
+        : '当前选择的课中没有可练习的词语';
+      document.getElementById('content').innerHTML = `<div class="empty-tip">${msg}</div>`;
+      document.getElementById('subtitle').textContent = '—';
+      document.getElementById('answer-section').classList.remove('show');
+      return;
+    }
+
+    // Type C/D 自身就有 8/6 上限，按 pool 长度再裁
+    const actualCount = Math.min(count, pool.length);
+    currentItems = shuffle(pool).slice(0, actualCount);
+
+    // 副标题
+    const lessonNames = Array.from(new Set(currentItems.map(it => it.lessonId))).join('、');
+    document.getElementById('subtitle').textContent =
+      `题型：${TYPE_NAME[type]} · 共 ${actualCount} 题 · 范围：${lessonNames}`;
+
+    // 渲染
+    let html = '';
+    if (type === 'A') html = buildTypeA(currentItems, actualCount);
+    else if (type === 'B') html = buildTypeB(currentItems);
+    else if (type === 'C') html = buildTypeC(currentItems);
+    else if (type === 'D') html = buildTypeD(currentItems);
+    document.getElementById('content').innerHTML = html;
+
+    // 答案
+    buildAnswer(type, currentItems);
+    document.getElementById('answer-section').classList.remove('show');
+  }
+
+  // ===================================================================
+  // 课次面板构建
+  // ===================================================================
+  function buildLessonPanel() {
+    const groups = [
+      { key: '识字', title: '识字' },
+      { key: '课文', title: '课文' },
+      { key: '园地', title: '园地' },
+      { key: '词语', title: '词语' }
+    ];
+    // 默认勾选：识字 / 课文 / 园地（不勾选「词语」，仅 D 题型需用）
+    const isDefaultChecked = (l) => l.group !== '词语';
+
+    const html = groups.map(g => {
+      const ls = LESSONS.filter(l => l.group === g.key);
+      const items = ls.map(l => {
+        const checked = isDefaultChecked(l) ? 'checked' : '';
+        return `<div class="lp-lesson">
+          <input type="checkbox" data-id="${l.id}" id="cb-${l.id}" ${checked}>
+          <label for="cb-${l.id}">${l.name} <span style="color:#aaa;">(${l.items.length})</span></label>
+        </div>`;
+      }).join('');
+      return `<div class="lp-group">
+        <h4>${g.title}（${ls.length}）</h4>
+        ${items}
+      </div>`;
+    }).join('');
+    document.getElementById('lp-groups').innerHTML = html;
+    updateSelectedCount();
+  }
+
+  function updateSelectedCount() {
+    const n = document.querySelectorAll('.lp-lesson input:checked').length;
+    document.getElementById('selected-count').textContent = n;
+  }
+
+  // ===================================================================
+  // 事件绑定
+  // ===================================================================
+  document.getElementById('btn-lessons').addEventListener('click', () => {
+    document.getElementById('lesson-panel').classList.toggle('show');
+  });
+  document.getElementById('btn-select-all').addEventListener('click', () => {
+    document.querySelectorAll('.lp-lesson input').forEach(el => el.checked = true);
+    updateSelectedCount();
+  });
+  document.getElementById('btn-select-none').addEventListener('click', () => {
+    document.querySelectorAll('.lp-lesson input').forEach(el => el.checked = false);
+    updateSelectedCount();
+  });
+  document.addEventListener('change', e => {
+    if (e.target.matches('.lp-lesson input')) updateSelectedCount();
+  });
+  document.getElementById('btn-generate').addEventListener('click', render);
+  document.getElementById('sel-count').addEventListener('change', render);
+  document.getElementById('sel-type').addEventListener('change', render);
+  document.getElementById('btn-answer').addEventListener('click', () => {
+    document.getElementById('answer-section').classList.toggle('show');
+  });
+  document.getElementById('btn-print').addEventListener('click', () => {
+    document.getElementById('answer-section').classList.remove('show');
+    smartPrint();
+  });
+
+  // 微信检测
+  function smartPrint() {
+    if (/MicroMessenger/i.test(navigator.userAgent)) {
+      document.getElementById('wx-print-mask').style.display = 'block';
+      return;
+    }
+    window.print();
+  }
+
+  // ===================================================================
+  // 启动
+  // ===================================================================
+  buildLessonPanel();
+  render();
+})();
+</script>
+</body>
+</html>

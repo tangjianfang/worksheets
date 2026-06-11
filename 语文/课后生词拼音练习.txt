@@ -1,0 +1,215 @@
+# 一年级下册写字表 200 字 · 看拼音选词语练习
+# 格式：拼音 + 含该字的常用词语（每课一行，6/4/7 个一组）
+# 数据源：人教统编版 一年级下册「写字表」
+# 修订：2026-06-11
+# 修复：5 课缺失已补全 / 16 处错音错字已修正 / 7 处课内缺字已补 / 标题去「完整版」
+
+
+识字一（春夏秋冬）
+
+chūn 春雨　dōng 冬天　chuī 吹风　huā 花园　fēi 飞鸟　rù 入口
+
+
+识字二（姓氏歌）
+
+shén 什么　me 多么　gǔ 古人　hú 胡子　shuāng 双手　yán 语言
+
+
+识字三（小青蛙）
+
+qīng 青草　qīng 清水　qíng 晴天　miáo 禾苗　qǐng 请问　shēng 学生
+
+
+识字四（猜字谜）
+
+zì 生字　hóng 红花　dòng 运动　wàn 万里　wú 无人　míng 明天
+
+
+园地一
+
+wén 语文　kǎ 卡片　piàn 相片　hé 合唱
+
+
+课文一（热爱中国共产党）
+
+gòng 共同　chǎn 生产　dǎng 党员　tài 太阳　yáng 阳光　guāng 光明
+
+
+课文二（吃水不忘挖井人）
+
+jǐng 水井　zhǔ 主人　jiāng 长江　zhù 住家　fāng 方法　hòu 后来
+
+
+课文三（我多想去看看）
+
+gào 告诉　de 我的　huì 开会　běi 北方　jīng 北京　guǎng 广场
+
+
+园地二
+
+xiě 写字　rèn 认识
+
+
+课文四（小公鸡和小鸭子）
+
+zǒu 走路　hé 小河　shuō 说话　ràng 让开　zì 自己　jǐ 自己
+
+
+课文五（树和喜鹊）
+
+cóng 从前　hǎo 好人　men 我们　jiào 叫声　tā 他们　huí 回家
+
+
+课文六（怎么都快乐）
+
+kuài 快乐　lè 快乐　dāng 当心　shū 读书　huà 图画　máo 毛笔
+
+
+课文七（静夜思）
+
+sī 思念　chuáng 床头　qián 前面　dì 土地　gù 故乡　xiāng 家乡
+
+
+课文八（夜色）
+
+sè 颜色　bǎ 把手　jiǎng 讲话　yàng 一样　xiào 微笑　zài 再见
+
+
+课文九（端午粽）
+
+jié 节日　mǐ 大米　jiān 中间　fēn 分开　chī 吃饭　ròu 牛肉
+
+
+园地三
+
+zhǐ 停止　jīn 公斤　cùn 尺寸　dīng 丁香　qiān 千万　dàn 元旦
+
+
+园地四
+
+cè 画册　zhī 一支　diàn 电灯　yī 衣服
+
+
+识字五（动物儿歌）
+
+wù 动物　zào 造句　yùn 运动　huān 喜欢　fáng 房子　wǎng 上网
+
+
+识字六（古对今）
+
+duì 对错　jīn 今天　xuě 白雪　xì 细心　xī 夕阳　yǔ 语言
+
+
+识字七（操场上）
+
+dǎ 打球　pí 皮球　pǎo 跑步　zú 足球　shā 沙包　bāo 书包
+
+
+识字八（人之初）
+
+jìn 远近　xí 学习　yuǎn 远方　xué 学校　yù 玉米　yì 正义
+
+
+园地五
+
+bǎo 吃饱　bào 拥抱
+
+
+课文十（古诗二首）
+
+shǒu 一首　chí 水池　cǎi 采花　jiān 尖角　jiǎo 牛角　zǎo 早上
+
+
+课文十一（浪花）
+
+yǎn 眼睛　lèi 眼泪　tā 它们　bèi 贝壳　qì 空气　wá 娃娃
+
+
+课文十二（荷叶圆圆）
+
+jī 飞机　tái 讲台　chàng 唱歌　sǎn 雨伞　duǒ 花朵　měi 美丽
+
+
+课文十三（要下雨了）
+
+zhè 这里　kàn 看见　yú 金鱼　miàn 前面　wèn 问题　jiā 加油
+
+
+园地六
+
+dòu 红豆　dǒu 星斗
+
+
+课文十四（文具的家）
+
+bǐ 毛笔　zhī 知道　dào 道路　fàng 放学　píng 平安　ān 安全
+
+
+课文十五（一分钟）
+
+yuán 元旦　dēng 电灯　chē 汽车　zhàn 车站　zuò 坐下　lǎo 老人　shī 老师
+
+
+课文十六（动物王国开大会）
+
+guó 中国　dōu 都是　bǎi 一百　tīng 听话　shí 时间　diǎn 一点　lín 树林
+
+
+课文十七（小猴子下山）
+
+gāo 高兴　xìng 高兴　zhe 看着　wǎng 往来　guā 西瓜　tù 兔子　jìn 前进
+
+
+园地七
+
+jīn 毛巾　xǐ 洗手
+
+
+课文十八（棉花姑娘）
+
+tā 她们　kōng 天空　hái 还有　gān 干净　shēn 身体　xīng 星星　jiǔ 长久
+
+
+课文十九（咕咚）
+
+xià 吓人　wèi 因为　pà 害怕　jiā 回家　xiàng 大象　méi 没有　dào 到达
+
+
+课文二十（小壁虎借尾巴）
+
+xiàng 方向　biān 身边　xíng 行走　cǎo 小草　gǎn 赶快　guò 走过　zhǎo 寻找
+
+
+园地八
+
+yè 一页　hù 户口　jiāo 交友　fù 父亲
+
+
+# ====== 双字词语汇总（可选补充练习） ======
+# 下方为含写字表字的常用 2 字词，标注完整拼音
+# 来源：从课后生词中精选，组词方向为「包含该课写字」
+
+词语一
+
+běi jīng 北京　fēi rù 飞入　shēng chǎn 生产　xiě zì 写字　tài yáng 太阳
+hòu lái 后来　guǎng gào 广告　chūn yǔ 春雨　chuī fēng 吹风　yǔ yán 语言
+kǎ piàn 卡片　shén me 什么
+
+
+词语二
+
+qíng tiān 晴天　qǐng wèn 请问　hú zi 胡子　dōng rì 冬日　qīng shuǐ 清水
+huǒ hóng 火红　wú rén 无人　wàn lǐ 万里　shuāng fāng 双方　gōng gòng 公共
+jǐng kǒu 井口　dǎng yuán 党员
+
+
+词语三
+
+zhǔ rén 主人　zhù kǒu 住口　cháng jiāng 长江　guǎng dà 广大　guāng míng 光明
+rèn shì 认识　kāi huā 开花　hé chàng 合唱　dòng shǒu 动手
+
+
+词语四
+
+shì de 是的　kāi huì 开会　qīng shān 青山　běi fāng 北方　rèn kě 认可
+xiān hòu 先后　hé miáo 禾苗　yáng guāng 阳光　wén míng 文明
