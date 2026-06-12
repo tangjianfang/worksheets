@@ -243,10 +243,10 @@
   <div class="radio-group">
     <span style="font-size:14px;">范围：</span>
     <label>
-      <input type="radio" name="range" value="20" checked /> 20 以内
+      <input type="radio" name="range" value="10" checked /> 10 以内
     </label>
     <label>
-      <input type="radio" name="range" value="100" /> 100 以内
+      <input type="radio" name="range" value="100" /> 100 以内（不出现个位）
     </label>
   </div>
   <div class="sep"></div>
@@ -265,7 +265,7 @@
 <!-- A4 页面 -->
 <div id="page-wrapper">
   <div id="a4-page">
-    <div class="page-title" id="page-title">20以内加减法练习</div>
+    <div class="page-title" id="page-title">10以内加减法练习</div>
     <div class="info-bar">
       <span>姓名：<span class="info-fill"></span></span>
       <span>日期：<span class="info-fill" style="width:100px;"></span></span>
@@ -288,19 +288,22 @@
   }
 
   // 生成一道题：{ expr: '12 + 7 = ', answer: 19 }
+  // maxVal=10：标准 10 以内；maxVal=100：100 以内且两个运算数都 ≥ 10（不出现个位）
   function generateProblem(maxVal) {
-    // 随机选加法或减法
     const isAdd = Math.random() < 0.5;
+    const minOp = maxVal >= 100 ? 10 : 1;  // 100 以内模式：强制两位数
     let a, b, answer;
     if (isAdd) {
-      // a + b = answer,  answer <= maxVal
-      a = randInt(1, maxVal - 1);
-      b = randInt(1, maxVal - a);
+      // a + b <= maxVal，且 a,b >= minOp
+      // a 范围：[minOp, maxVal - minOp]
+      a = randInt(minOp, maxVal - minOp);
+      b = randInt(minOp, maxVal - a);
       answer = a + b;
     } else {
-      // a - b = answer,  a <= maxVal, b >= 1, answer >= 0
-      a = randInt(1, maxVal);
-      b = randInt(0, a);
+      // a - b >= 0，且 a,b >= minOp
+      // a 范围：[minOp, maxVal]
+      a = randInt(minOp, maxVal);
+      b = randInt(minOp, a);
       answer = a - b;
     }
     const op = isAdd ? '+' : '−';
@@ -339,8 +342,9 @@
     const count  = getSelectedValue('count') || 40;
 
     // 更新标题
+    const titleSuffix = maxVal >= 100 ? '（两位数）' : '';
     document.getElementById('page-title').textContent =
-      `${maxVal}以内加减法练习`;
+      `${maxVal}以内加减法练习${titleSuffix}`;
 
     // 更新页脚
     const scorePerQ = count > 0 ? (100 / count).toFixed(1) : 0;
