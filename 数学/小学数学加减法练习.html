@@ -174,6 +174,45 @@
       line-height: 1;
     }
 
+    /* ===== 七巧板题型 ===== */
+    .tangram-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+    }
+    .tangram-cell {
+      border: 1px solid #e0e0e0;
+      padding: 6px 10px 5px;
+      display: flex;
+      flex-direction: column;
+      min-height: 78px;
+    }
+    .tangram-cell .problem-number { font-size: 10px; color: #999; margin-bottom: 2px; }
+    .tangram-cell .tg-svg-row {
+      display: flex; align-items: center; gap: 8px;
+      margin: 2px 0 4px;
+    }
+    .tangram-cell .tg-svg-row svg { flex-shrink: 0; }
+    .tangram-cell .tg-q {
+      font-size: 13px; line-height: 1.4; flex: 1;
+    }
+    .tangram-cell .tg-q .blank {
+      display: inline-block; min-width: 36px; height: 18px;
+      border-bottom: 1.2px solid #333; vertical-align: -3px;
+      margin: 0 2px;
+    }
+    .tangram-cell .tg-opts {
+      margin-top: 4px; font-size: 12px; line-height: 1.6;
+    }
+    .tangram-cell .tg-opt { display: inline-block; margin-right: 10px; }
+    .tangram-cell .tg-opt-letter { color: #1565c0; font-weight: bold; margin-right: 2px; }
+    .tangram-cell .tg-ans-row {
+      display: flex; align-items: flex-end; gap: 6px;
+      margin-top: auto; padding-top: 4px;
+    }
+    .tangram-cell .tg-ans-row .ans-label { font-size: 11px; color: #999; }
+
     /* ===== 打印样式 ===== */
     @media print {
       @page { size: A4 portrait; margin: 0; }
@@ -248,6 +287,12 @@
     <label>
       <input type="radio" name="range" value="100" /> 100 以内（不出现个位）
     </label>
+  </div>
+  <div class="sep"></div>
+  <div class="radio-group">
+    <span style="font-size:14px;">题型：</span>
+    <label><input type="radio" name="qtype" value="arith" checked /> 加减法</label>
+    <label><input type="radio" name="qtype" value="tangram" /> 七巧板</label>
   </div>
   <div class="sep"></div>
   <div class="radio-group">
@@ -334,34 +379,131 @@
   // -------- 渲染 --------
   function getSelectedValue(name) {
     const el = document.querySelector(`input[name="${name}"]:checked`);
-    return el ? parseInt(el.value, 10) : null;
+    if (!el) return null;
+    const v = el.value;
+    // arith/ tangram 等字符串值原样返回；纯数字才 parseInt
+    return /^\d+$/.test(v) ? parseInt(v, 10) : v;
   }
 
-  function render() {
-    const maxVal = getSelectedValue('range') || 20;
+  // ===================================================================
+  // 七巧板题池 + SVG 工具
+  // ===================================================================
+  // 七巧板全套 SVG（简笔画，2 行布局：上行 2 大三角板，下行 5 小件）
+  const TG_FULL = `<svg viewBox="0 0 200 80" width="180" height="72" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#333" stroke-width="0.6" stroke-linejoin="round">
+      <polygon points="6,6 90,6 48,70" fill="#ff6b6b"/>
+      <polygon points="110,6 194,6 152,70" fill="#4ecdc4"/>
+      <polygon points="6,76 56,76 31,40" fill="#ffd93d"/>
+      <polygon points="60,76 100,76 80,46" fill="#6bcf7f"/>
+      <polygon points="104,76 144,76 124,46" fill="#aa96da"/>
+      <polygon points="152,76 168,60 184,76" fill="#f38181"/>
+      <polygon points="6,40 26,40 46,30 26,30" fill="#c9b1ff"/>
+    </g>
+  </svg>`;
+  // 单独一块大三角板
+  const TG_LARGE = `<svg viewBox="0 0 100 90" width="50" height="44" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="6,6 94,6 50,84" fill="#ff6b6b" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+  </svg>`;
+  // 单独一块中三角板
+  const TG_MEDIUM = `<svg viewBox="0 0 60 54" width="36" height="32" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="4,4 56,4 30,50" fill="#ffd93d" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+  </svg>`;
+  // 单独一块小三角板
+  const TG_SMALL = `<svg viewBox="0 0 40 36" width="28" height="24" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="3,3 37,3 20,33" fill="#6bcf7f" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+  </svg>`;
+  // 单独正方形
+  const TG_SQUARE = `<svg viewBox="0 0 40 40" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="3" width="34" height="34" fill="#aa96da" stroke="#333" stroke-width="0.8"/>
+  </svg>`;
+  // 单独平行四边形
+  const TG_PARA = `<svg viewBox="0 0 60 40" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="6,6 54,6 44,34 -4,34" fill="#c9b1ff" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+  </svg>`;
+  // 错位平行四边形（看起来像 4 边形但不是平行四边形）
+  const TG_TRAP = `<svg viewBox="0 0 60 40" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="6,6 54,6 38,34 14,34" fill="#f38181" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+  </svg>`;
+  // 普通三角形（对照 - 不是大三角板的形状）
+  const TG_PLAIN_TRI = `<svg viewBox="0 0 60 50" width="36" height="30" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="4,46 30,4 56,46" fill="#6bcf7f" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+  </svg>`;
+
+  // 7 块 关系数据：
+  //   大三角板 = 1/4 正方形；中三角板 = 1/8；小三角板 = 1/16；
+  //   正方形 = 1/8；平行四边形 = 1/8
+  //   2 个小三角板 可拼成 中三角板（面积 1/8）/ 正方形 / 平行四边形
+  //   1 个中三角板 + 2 个小三角板 = 1 个大三角板
+  // 题池：每题 { type, q, a, opts? }   a 可以是数字或字母
+  const TANGRAM_QUESTIONS = [
+    // ====== 计数（最简单）======
+    { type: 'count', svg: TG_FULL, q: '七巧板由 <span class="blank"></span> 块图形组成。', a: 7 },
+    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 个三角形。', a: 5 },
+    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 个正方形。', a: 1 },
+    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 个平行四边形。', a: 1 },
+    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 块大三角板。', a: 2 },
+    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 块小三角板。', a: 2 },
+    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 块中三角板。', a: 1 },
+    { type: 'count', svg: TG_FULL, q: '七巧板里三角板一共有 <span class="blank"></span> 块。', a: 5 },
+    // ====== 面积（进阶）======
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 16，每块大三角板面积 = <span class="blank"></span>', a: 4 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 32，每块中三角板面积 = <span class="blank"></span>', a: 8 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 16，每块小三角板面积 = <span class="blank"></span>', a: 2 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 16，正方形这块面积 = <span class="blank"></span>', a: 2 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 64，每块大三角板面积 = <span class="blank"></span>', a: 16 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 32，每块小三角板面积 = <span class="blank"></span>', a: 4 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成的正方形边长 4cm，整个七巧板面积 = <span class="blank"></span> cm²', a: 16 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成的正方形边长 6cm，整个七巧板面积 = <span class="blank"></span> cm²', a: 36 },
+    { type: 'area',  svg: TG_FULL, q: '七巧板拼成的正方形边长 8cm，每块大三角板面积 = <span class="blank"></span> cm²', a: 16 },
+    // ====== 图形辨认（多选 - 中等）======
+    { type: 'mc', svg: TG_FULL, q: '下面哪个图形是平行四边形？',
+      opts: [TG_LARGE, TG_SQUARE, TG_PARA, TG_TRAP], a: 'C' },
+    { type: 'mc', svg: TG_FULL, q: '下面哪个图形是正方形？',
+      opts: [TG_PARA, TG_TRAP, TG_LARGE, TG_SQUARE], a: 'D' },
+    { type: 'mc', svg: TG_FULL, q: '下面哪个是七巧板里的大三角板？',
+      opts: [TG_MEDIUM, TG_SMALL, TG_LARGE, TG_PLAIN_TRI], a: 'C' },
+    { type: 'mc', svg: TG_FULL, q: '下面哪个是中三角板？',
+      opts: [TG_LARGE, TG_MEDIUM, TG_SMALL, TG_PARA], a: 'B' },
+    { type: 'mc', svg: TG_FULL, q: '下面哪个是平行四边形？<br/>(不是正方形/梯形/三角形)',
+      opts: [TG_SQUARE, TG_TRAP, TG_PARA, TG_PLAIN_TRI], a: 'C' },
+    // ====== 组合关系（高阶 - 需要空间想象）======
+    { type: 'mc', svg: TG_FULL, q: '把两块小三角板拼起来，可以得到哪个图形？',
+      opts: ['中三角板', '大三角板', '正方形', '圆形'], a: 'C' },
+    { type: 'mc', svg: TG_FULL, q: '一块中三角板 + 两块小三角板 = ?',
+      opts: ['一块大三角板', '一块正方形', '一块平行四边形', '两块中三角板'], a: 'A' },
+    { type: 'mc', svg: TG_FULL, q: '两块大三角板拼起来，是什么图形？',
+      opts: ['正方形', '三角形', '长方形', '平行四边形'], a: 'A' },
+    { type: 'mc', svg: TG_FULL, q: '七巧板里一共有几种不同的图形？',
+      opts: ['2 种', '3 种', '4 种', '5 种'], a: 'B' },
+    { type: 'mc', svg: TG_FULL, q: '哪一块的面积等于两块小三角板？',
+      opts: ['大三角板', '中三角板', '大三角板的一半', '两块中三角板'], a: 'B' },
+  ];
+
+  function generateTangramQuestion() {
+    return TANGRAM_QUESTIONS[randInt(0, TANGRAM_QUESTIONS.length - 1)];
+  }
+
+  function renderArith() {
+    const maxVal = getSelectedValue('range') || 10;
     const count  = getSelectedValue('count') || 40;
 
-    // 更新标题
+    // 标题 + 页脚
     const titleSuffix = maxVal >= 100 ? '（两位数）' : '';
     document.getElementById('page-title').textContent =
       `${maxVal}以内加减法练习${titleSuffix}`;
-
-    // 更新页脚
     const scorePerQ = count > 0 ? (100 / count).toFixed(1) : 0;
     document.getElementById('page-footer').textContent =
       `共 ${count} 题 · 每题 ${scorePerQ} 分`;
 
-    // 调整网格列数和行数，使每行均分填满页面高度
+    // 5 列网格
+    const grid = document.getElementById('problem-grid');
+    grid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    grid.className = '';
     const cols = 5;
     const rows = Math.ceil(count / cols);
-    const grid = document.getElementById('problem-grid');
-    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
-    // 生成题目
     const problems = generateProblems(maxVal, count);
-
-    // 清空并渲染
     grid.innerHTML = '';
     problems.forEach((p, i) => {
       const cell = document.createElement('div');
@@ -371,13 +513,72 @@
         `<div class="problem-expr">${p.expr} <span class="answer-line" data-ans="${p.answer}"></span></div>`;
       grid.appendChild(cell);
     });
+    hideAnswers();
+  }
 
-    // 重新生成时隐藏答案
+  function renderTangram() {
+    const count = getSelectedValue('count') || 40;
+    document.getElementById('page-title').textContent = '七巧板练习';
+    document.getElementById('page-footer').textContent =
+      `共 ${count} 题 · 七巧板综合题`;
+
+    const grid = document.getElementById('problem-grid');
+    grid.style.gridTemplateColumns = '1fr 1fr';
+    grid.className = 'tangram-grid';
+    // 不强制行高，让每行按内容自适应
+    grid.style.gridTemplateRows = '';
+
+    // 抽题：随机不重复
+    const seen = new Set();
+    const picks = [];
+    let attempts = 0;
+    while (picks.length < count && attempts < count * 10) {
+      attempts++;
+      const q = generateTangramQuestion();
+      const key = q.q;
+      if (!seen.has(key)) { seen.add(key); picks.push(q); }
+    }
+    while (picks.length < count) picks.push(generateTangramQuestion());
+
+    grid.innerHTML = '';
+    picks.forEach((q, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'tangram-cell';
+
+      // 题目部分
+      let html = `<div class="problem-number">${i + 1}.</div>`;
+      // SVG 行（题图 + 选项小图）
+      if (q.opts && Array.isArray(q.opts)) {
+        // 选择题：每个选项都内嵌一个 SVG
+        const optsHtml = q.opts.map((o, idx) => {
+          if (typeof o === 'string' && o.startsWith('<svg')) {
+            return `<span class="tg-opt"><span class="tg-opt-letter">${String.fromCharCode(65 + idx)}.</span>${o}</span>`;
+          }
+          return `<span class="tg-opt"><span class="tg-opt-letter">${String.fromCharCode(65 + idx)}.</span>${o}</span>`;
+        }).join('');
+        html += `<div class="tg-opts">${optsHtml}</div>`;
+      }
+      html += `<div class="tg-q">${q.q}</div>`;
+      // 答题区
+      html += `<div class="tg-ans-row"><span class="ans-label">答：</span><span class="answer-line" data-ans="${q.a}"></span></div>`;
+      cell.innerHTML = html;
+      grid.appendChild(cell);
+    });
+    hideAnswers();
+  }
+
+  function hideAnswers() {
     document.getElementById('a4-page').classList.remove('show-answers');
     const btn = document.getElementById('btn-answer');
     btn.textContent = '👁 显示答案';
     btn.style.background = '';
     btn.style.color = '';
+  }
+
+  function render() {
+    const qtype = getSelectedValue('qtype') || 'arith';
+    if (qtype === 'tangram') renderTangram();
+    else renderArith();
   }
 
   // -------- 事件绑定 --------
@@ -394,8 +595,8 @@
     smartPrint();
   });
 
-  // 切换范围/题数时自动重新生成
-  document.querySelectorAll('input[name="range"], input[name="count"]')
+  // 切换范围/题数/题型时自动重新生成
+  document.querySelectorAll('input[name="range"], input[name="count"], input[name="qtype"]')
     .forEach(function (el) {
       el.addEventListener('change', render);
     });
