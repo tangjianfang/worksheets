@@ -183,12 +183,18 @@
     }
     .tangram-cell {
       border: 1px solid #e0e0e0;
-      padding: 6px 10px 5px;
+      padding: 5px 8px 4px;
       display: flex;
       flex-direction: column;
-      min-height: 78px;
+      min-height: 60px;
     }
-    .tangram-cell .problem-number { font-size: 10px; color: #999; margin-bottom: 2px; }
+    .tangram-cell .problem-number { font-size: 10px; color: #999; margin-bottom: 1px; }
+    .tangram-cell .tg-svg {
+      display: flex; justify-content: center; align-items: center;
+      margin: 1px 0 2px;
+      min-height: 24px;
+    }
+    .tangram-cell .tg-svg svg { max-width: 100%; height: auto; }
     .tangram-cell .tg-svg-row {
       display: flex; align-items: center; gap: 8px;
       margin: 2px 0 4px;
@@ -429,54 +435,169 @@
     <polygon points="4,46 30,4 56,46" fill="#6bcf7f" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
   </svg>`;
 
+  // ===== 折叠/切割示意 SVG（带虚线折线/切线）=====
+  // 大三角板 + 沿中线（斜边中点→直角顶点）对折
+  const TG_FOLD_LARGE = `<svg viewBox="0 0 100 90" width="78" height="70" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="6,6 94,6 50,84" fill="#ff6b6b" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+    <line x1="50" y1="45" x2="50" y2="84" stroke="#000" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.8"/>
+  </svg>`;
+  // 中三角板 + 沿中线对折
+  const TG_FOLD_MEDIUM = `<svg viewBox="0 0 60 54" width="56" height="50" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="4,4 56,4 30,50" fill="#ffd93d" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+    <line x1="30" y1="27" x2="30" y2="50" stroke="#000" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.8"/>
+  </svg>`;
+  // 正方形 + 对角线对折
+  const TG_FOLD_SQ_DIAG = `<svg viewBox="0 0 60 60" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="4" width="52" height="52" fill="#aa96da" stroke="#333" stroke-width="0.8"/>
+    <line x1="4" y1="4" x2="56" y2="56" stroke="#000" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.8"/>
+  </svg>`;
+  // 正方形 + 十字切两刀
+  const TG_FOLD_SQ_CROSS = `<svg viewBox="0 0 60 60" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="4" width="52" height="52" fill="#aa96da" stroke="#333" stroke-width="0.8"/>
+    <line x1="4" y1="30" x2="56" y2="30" stroke="#000" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.8"/>
+    <line x1="30" y1="4" x2="30" y2="56" stroke="#000" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.8"/>
+  </svg>`;
+  // 平行四边形 + 对角线对折
+  const TG_FOLD_PARA = `<svg viewBox="0 0 60 40" width="68" height="46" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="6,6 54,6 44,34 -4,34" fill="#c9b1ff" stroke="#333" stroke-width="0.8" stroke-linejoin="round"/>
+    <line x1="6" y1="6" x2="44" y2="34" stroke="#000" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.8"/>
+  </svg>`;
+
+  // ===== 拼合示意 SVG（多块组合）=====
+  // 2 个小三角板（沿斜边拼成大三角板）
+  const TG_2SMALL_BIG = `<svg viewBox="0 0 60 56" width="56" height="52" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="4,4 56,4 30,52" fill="#6bcf7f" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+    <line x1="30" y1="4" x2="30" y2="52" stroke="#000" stroke-width="0.4" stroke-dasharray="2,1.5" opacity="0.7"/>
+  </svg>`;
+  // 2 个小三角板（分离）
+  const TG_2SMALL = `<svg viewBox="0 0 80 36" width="74" height="34" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="3,3 37,3 20,33" fill="#6bcf7f" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+    <polygon points="43,3 77,3 60,33" fill="#6bcf7f" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+  </svg>`;
+  // 2 个小三角板（沿直角边拼成正方形）
+  const TG_2SMALL_SQ = `<svg viewBox="0 0 40 40" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="3,3 37,3 20,20" fill="#6bcf7f" stroke="#333" stroke-width="0.6"/>
+    <polygon points="3,3 20,20 3,37" fill="#6bcf7f" stroke="#333" stroke-width="0.6"/>
+  </svg>`;
+  // 4 个小三角板拼成正方形
+  const TG_4SMALL_SQ = `<svg viewBox="0 0 50 50" width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="3,3 47,3 25,25" fill="#6bcf7f" stroke="#333" stroke-width="0.5"/>
+    <polygon points="3,3 25,25 3,47" fill="#6bcf7f" stroke="#333" stroke-width="0.5"/>
+    <polygon points="47,3 25,25 47,47" fill="#6bcf7f" stroke="#333" stroke-width="0.5"/>
+    <polygon points="3,47 25,25 47,47" fill="#6bcf7f" stroke="#333" stroke-width="0.5"/>
+  </svg>`;
+  // 2 个中三角板拼成大三角板
+  const TG_2MED_BIG = `<svg viewBox="0 0 100 90" width="80" height="72" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="6,6 94,6 50,84" fill="none" stroke="#333" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="6,6 50,45 50,84" fill="#ffd93d" stroke="#333" stroke-width="0.5" stroke-linejoin="round"/>
+    <polygon points="94,6 50,45 50,84" fill="#ffd93d" stroke="#333" stroke-width="0.5" stroke-linejoin="round"/>
+  </svg>`;
+  // 2 个大三角板拼成正方形
+  const TG_2LARGE_SQ = `<svg viewBox="0 0 80 80" width="70" height="70" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="3,3 77,3 40,40" fill="#ff6b6b" stroke="#333" stroke-width="0.5"/>
+    <polygon points="3,3 40,40 3,77" fill="#ff6b6b" stroke="#333" stroke-width="0.5"/>
+    <polygon points="77,3 40,40 77,77" fill="#ff6b6b" stroke="#333" stroke-width="0.5"/>
+    <polygon points="3,77 40,40 77,77" fill="#ff6b6b" stroke="#333" stroke-width="0.5"/>
+  </svg>`;
+  // 1 中 + 1 小 并排
+  const TG_MED_SMALL = `<svg viewBox="0 0 100 50" width="76" height="38" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="4,4 60,4 32,46" fill="#ffd93d" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+    <polygon points="64,4 96,4 80,30" fill="#6bcf7f" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+  </svg>`;
+  // 1 正方 + 1 小
+  const TG_SQ_SMALL = `<svg viewBox="0 0 80 40" width="74" height="36" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="4" width="32" height="32" fill="#aa96da" stroke="#333" stroke-width="0.6"/>
+    <polygon points="44,4 76,4 60,30" fill="#6bcf7f" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+  </svg>`;
+  // 1 大 + 1 小
+  const TG_LAR_SMALL = `<svg viewBox="0 0 130 90" width="80" height="56" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="4,6 60,6 32,52" fill="#ff6b6b" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+    <polygon points="68,4 110,4 89,38" fill="#6bcf7f" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+  </svg>`;
+  // 1 中 + 1 正方
+  const TG_MED_SQ = `<svg viewBox="0 0 100 60" width="80" height="48" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="4,4 56,4 30,52" fill="#ffd93d" stroke="#333" stroke-width="0.6" stroke-linejoin="round"/>
+    <rect x="62" y="14" width="32" height="32" fill="#aa96da" stroke="#333" stroke-width="0.6"/>
+  </svg>`;
+
   // 7 块 关系数据：
   //   大三角板 = 1/4 正方形；中三角板 = 1/8；小三角板 = 1/16；
   //   正方形 = 1/8；平行四边形 = 1/8
   //   2 个小三角板 可拼成 中三角板（面积 1/8）/ 正方形 / 平行四边形
   //   1 个中三角板 + 2 个小三角板 = 1 个大三角板
-  // 题池：每题 { type, q, a, opts? }   a 可以是数字或字母
+  // 题池：每题 { type, q, a, opts?, svg? }
+  //   强调：空间想象、逻辑推理、组合分析 —— 不只是"识别某块"
+  //   难度梯度：折叠/切割（最想象）> 拼合推理 > 面积关系 > 图形特性 > 拼图应用
   const TANGRAM_QUESTIONS = [
-    // ====== 计数（最简单）======
-    { type: 'count', svg: TG_FULL, q: '七巧板由 <span class="blank"></span> 块图形组成。', a: 7 },
-    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 个三角形。', a: 5 },
-    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 个正方形。', a: 1 },
-    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 个平行四边形。', a: 1 },
-    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 块大三角板。', a: 2 },
-    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 块小三角板。', a: 2 },
-    { type: 'count', svg: TG_FULL, q: '七巧板里有 <span class="blank"></span> 块中三角板。', a: 1 },
-    { type: 'count', svg: TG_FULL, q: '七巧板里三角板一共有 <span class="blank"></span> 块。', a: 5 },
-    // ====== 面积（进阶）======
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 16，每块大三角板面积 = <span class="blank"></span>', a: 4 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 32，每块中三角板面积 = <span class="blank"></span>', a: 8 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 16，每块小三角板面积 = <span class="blank"></span>', a: 2 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 16，正方形这块面积 = <span class="blank"></span>', a: 2 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 64，每块大三角板面积 = <span class="blank"></span>', a: 16 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成正方形面积是 32，每块小三角板面积 = <span class="blank"></span>', a: 4 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成的正方形边长 4cm，整个七巧板面积 = <span class="blank"></span> cm²', a: 16 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成的正方形边长 6cm，整个七巧板面积 = <span class="blank"></span> cm²', a: 36 },
-    { type: 'area',  svg: TG_FULL, q: '七巧板拼成的正方形边长 8cm，每块大三角板面积 = <span class="blank"></span> cm²', a: 16 },
-    // ====== 图形辨认（多选 - 中等）======
-    { type: 'mc', svg: TG_FULL, q: '下面哪个图形是平行四边形？',
-      opts: [TG_LARGE, TG_SQUARE, TG_PARA, TG_TRAP], a: 'C' },
-    { type: 'mc', svg: TG_FULL, q: '下面哪个图形是正方形？',
-      opts: [TG_PARA, TG_TRAP, TG_LARGE, TG_SQUARE], a: 'D' },
-    { type: 'mc', svg: TG_FULL, q: '下面哪个是七巧板里的大三角板？',
-      opts: [TG_MEDIUM, TG_SMALL, TG_LARGE, TG_PLAIN_TRI], a: 'C' },
-    { type: 'mc', svg: TG_FULL, q: '下面哪个是中三角板？',
-      opts: [TG_LARGE, TG_MEDIUM, TG_SMALL, TG_PARA], a: 'B' },
-    { type: 'mc', svg: TG_FULL, q: '下面哪个是平行四边形？<br/>(不是正方形/梯形/三角形)',
-      opts: [TG_SQUARE, TG_TRAP, TG_PARA, TG_PLAIN_TRI], a: 'C' },
-    // ====== 组合关系（高阶 - 需要空间想象）======
-    { type: 'mc', svg: TG_FULL, q: '把两块小三角板拼起来，可以得到哪个图形？',
-      opts: ['中三角板', '大三角板', '正方形', '圆形'], a: 'C' },
-    { type: 'mc', svg: TG_FULL, q: '一块中三角板 + 两块小三角板 = ?',
-      opts: ['一块大三角板', '一块正方形', '一块平行四边形', '两块中三角板'], a: 'A' },
-    { type: 'mc', svg: TG_FULL, q: '两块大三角板拼起来，是什么图形？',
-      opts: ['正方形', '三角形', '长方形', '平行四边形'], a: 'A' },
-    { type: 'mc', svg: TG_FULL, q: '七巧板里一共有几种不同的图形？',
+    // ====== 折叠/切割（空间想象 - 最难）======
+    { type: 'mc', svg: TG_FOLD_LARGE, q: '把一块大三角板沿虚线对折一次，会得到什么？',
+      opts: ['2 个中三角板', '2 个小三角板', '1 个正方形', '1 个平行四边形'], a: 'A' },
+    { type: 'mc', svg: TG_FOLD_MEDIUM, q: '把一块中三角板沿虚线对折一次，会得到什么？',
+      opts: ['1 个大三角板', '2 个小三角板', '1 个正方形', '1 个平行四边形'], a: 'B' },
+    { type: 'mc', svg: TG_FOLD_SQ_DIAG, q: '把一个正方形沿对角线对折一次，会得到什么？',
+      opts: ['2 个大三角板', '2 个中三角板', '4 个小三角板', '1 个长方形'], a: 'A' },
+    { type: 'mc', svg: TG_FOLD_SQ_CROSS, q: '把一个正方形按虚线切两刀（十字），会得到几个什么？',
+      opts: ['2 个大三角板', '4 个小三角板', '4 个中三角板', '2 个正方形'], a: 'B' },
+    { type: 'mc', svg: TG_FOLD_PARA, q: '把一个平行四边形沿对角线对折一次，会得到什么？',
+      opts: ['2 个大三角板', '2 个中三角板', '2 个小三角板', '1 中 + 1 小'], a: 'C' },
+    { type: 'mc', svg: TG_FOLD_LARGE, q: '把一块大三角板沿虚线对折，再对折一次（共两次），会得到几个什么？',
+      opts: ['2 个中三角板', '4 个小三角板', '1 个正方形', '4 个中三角板'], a: 'B' },
+
+    // ====== 面积关系（逻辑推理）======
+    { type: 'mc', svg: TG_MEDIUM, q: '1 块中三角板的面积 = ? 块小三角板',
+      opts: ['1', '2', '3', '4'], a: 'B' },
+    { type: 'mc', svg: TG_LARGE, q: '1 块大三角板的面积 = ? 块中三角板',
+      opts: ['1', '2', '3', '4'], a: 'B' },
+    { type: 'mc', svg: TG_LARGE, q: '1 块大三角板的面积 = ? 块小三角板',
+      opts: ['2', '3', '4', '8'], a: 'C' },
+    { type: 'mc', svg: TG_SQUARE, q: '1 个正方形的面积 = ? 块小三角板',
+      opts: ['2', '4', '6', '8'], a: 'B' },
+    { type: 'mc', svg: TG_FULL, q: '1 个完整的七巧板（7 块拼成的正方形）面积 = ? 块小三角板',
+      opts: ['8', '12', '14', '16'], a: 'D' },
+    { type: 'mc', svg: TG_FULL, q: '七巧板里哪一块的面积 = 大三角板的 1/2？',
+      opts: ['小三角板', '中三角板', '正方形', '平行四边形'], a: 'B' },
+    { type: 'mc', svg: TG_SQUARE, q: '七巧板里的正方形、平行四边形、中三角板，它们的面积 ___？',
+      opts: ['都不同', '正方形最大', '三个一样大', '平行四边形最小'], a: 'C' },
+
+    // ====== 拼合/拆解（组合想象）======
+    { type: 'mc', svg: TG_2SMALL, q: '把 2 个小三角板（斜边对斜边）拼在一起，可以得到什么？',
+      opts: ['1 个中三角板', '1 个正方形', '1 个平行四边形', '以上都可能'], a: 'D' },
+    { type: 'mc', svg: TG_2MED_BIG, q: '把 2 个中三角板（如图）拼在一起，可以得到什么？',
+      opts: ['1 个大三角板', '1 个正方形', '1 个平行四边形', '以上都可能'], a: 'D' },
+    { type: 'mc', svg: TG_2LARGE_SQ, q: '把 2 个大三角板（如图）拼在一起，可以得到什么？',
+      opts: ['1 个正方形', '1 个长方形', '1 个平行四边形', '以上都可能'], a: 'D' },
+    { type: 'mc', svg: TG_4SMALL_SQ, q: '把 4 个小三角板拼成如图，可以得到什么？',
+      opts: ['1 个正方形', '1 个大三角板', '1 个平行四边形', '以上都能'], a: 'D' },
+    { type: 'mc', svg: TG_MED_SMALL, q: '1 个中三角板 + 1 个小三角板（如图），能拼成一个标准七巧板图形吗？',
+      opts: ['能（1 大）', '能（1 正方）', '能（1 平行）', '不能'], a: 'D' },
+    { type: 'mc', svg: TG_SQ_SMALL, q: '1 个正方形 + 1 个小三角板（如图），能拼成一个标准七巧板图形吗？',
+      opts: ['能（1 大）', '能（1 中）', '能（1 平行）', '不能'], a: 'D' },
+    { type: 'mc', svg: TG_LAR_SMALL, q: '1 个大三角板 + 1 个小三角板（如图），面积上等于？',
+      opts: ['2 个大三角板', '1 个大三角板 + 1 小 = 5 小', '2 个中三角板', '1 个七巧板'], a: 'B' },
+    { type: 'mc', svg: TG_MED_SQ, q: '1 个中三角板 + 1 个正方形（如图），面积上等于？',
+      opts: ['1 个大三角板', '2 个中三角板', '1 个七巧板的一半', '以上都对'], a: 'D' },
+
+    // ====== 图形特性（观察推理）======
+    { type: 'mc', svg: TG_FULL, q: '七巧板里大小完全一样的图形有 ___ 对？',
+      opts: ['1 对', '2 对', '3 对', '4 对'], a: 'B' },
+    { type: 'mc', svg: TG_LARGE, q: '把大三角板绕它的直角顶点旋转 90°，还是它本身吗？',
+      opts: ['是', '不是', '变小了', '不确定'], a: 'A' },
+    { type: 'mc', svg: TG_FULL, q: '七巧板里一共有几种不同形状的图形？',
       opts: ['2 种', '3 种', '4 种', '5 种'], a: 'B' },
-    { type: 'mc', svg: TG_FULL, q: '哪一块的面积等于两块小三角板？',
-      opts: ['大三角板', '中三角板', '大三角板的一半', '两块中三角板'], a: 'B' },
+    { type: 'mc', svg: TG_FULL, q: '七巧板里"只此一块"（没有重复）的有 ___ 块？',
+      opts: ['1 块', '2 块', '3 块', '5 块'], a: 'C' },
+    { type: 'mc', svg: TG_PARA, q: '七巧板里的平行四边形左右翻转后，和原来 ___？',
+      opts: ['不一样', '一样（轴对称）', '大小变了', '颜色变了'], a: 'B' },
+
+    // ====== 拼图/应用（综合推理）======
+    { type: 'mc', svg: TG_FULL, q: '用七巧板拼一个新的"正方形"（不是七巧板本身），最少需要几块？',
+      opts: ['1 块（已有正方形）', '2 块（2 个大三角板）', '3 块', '4 块'], a: 'B' },
+    { type: 'mc', svg: TG_FULL, q: '用七巧板拼一个新的"长方形"，最少需要几块？',
+      opts: ['1 块', '2 块', '3 块', '4 块'], a: 'C' },
+    { type: 'mc', svg: TG_FULL, q: '用七巧板拼一个新的"等腰三角形"（比已有大三角板更大），最少需要几块？',
+      opts: ['1 块', '2 块', '3 块', '4 块'], a: 'B' },
+    { type: 'mc', svg: TG_FULL, q: '七巧板能拼出"非对称"图形（左右不一样的）吗？',
+      opts: ['不能', '能（用 1 块平行四边形）', '能（用 2 块大三角板）', '能（任意组合）'], a: 'B' },
   ];
 
   function generateTangramQuestion() {
@@ -547,7 +668,11 @@
 
       // 题目部分
       let html = `<div class="problem-number">${i + 1}.</div>`;
-      // SVG 行（题图 + 选项小图）
+      // 题图（折叠/拼合示意） - 顶部
+      if (q.svg) {
+        html += `<div class="tg-svg">${q.svg}</div>`;
+      }
+      // SVG 行（选项小图）
       if (q.opts && Array.isArray(q.opts)) {
         // 选择题：每个选项都内嵌一个 SVG
         const optsHtml = q.opts.map((o, idx) => {
